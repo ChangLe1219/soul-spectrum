@@ -147,14 +147,13 @@
       <div class="code-card">
         <div class="lbl">结果码</div>
         <div class="code" id="r-code"></div>
-        <div class="tip">记下这串码,可凭它查看完整报告</div>
+        <div class="tip">你的专属结果码,复制或截图保存</div>
       </div>
       <div class="r-actions">
-        <a class="btn-primary" id="btn-detail" href="detail.html" style="text-decoration:none">查看完整报告 →</a>
         <button class="btn-ghost" id="btn-copy">复制结果</button>
         <button class="btn-ghost" id="btn-restart">再测一次</button>
       </div>
-      <p class="r-tiny">感谢你的 30 个答案</p>
+      <p class="r-tiny">感谢你的 30 个答案 · 把测试发给想了解的人吧</p>
     </div>
   </section>
 
@@ -699,7 +698,6 @@ function showResult() {
   $('r-en').textContent = `${T.en} · ${T.tagline}`;
   $('r-desc').textContent = T.desc;
   $('r-code').textContent = code;
-  $('btn-detail').href = 'detail.html?e=' + code;
   show('screen-result');
   warmthTarget = 1;
 }

@@ -894,7 +894,7 @@ function enter(code) {
     $('gate-err').style.display = data === null && code ? 'block' : 'none';
     return false;
   }
-  history.replaceState(null, '', '?e=' + code);
+  try { history.replaceState(null, '', '?e=' + code); } catch (e) {}
   render(data);
   window.scrollTo(0, 0);
   return true;
