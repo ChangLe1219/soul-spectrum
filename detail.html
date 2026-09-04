@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深度报告 · 底色解读</title>
+<meta name="description" content="凭结果码查看深度报告。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238a81b1'/%3E%3Cstop offset='1' stop-color='%23405078'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='26' fill='url(%23g)'/%3E%3C/svg%3E">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --accent:#8a81b1; }
+  html, body { height:100%; }
+  body { font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    background:#07060d; color:#eceaf2; overflow-x:hidden; min-height:100vh; -webkit-font-smoothing:antialiased; }
+  .serif { font-family:"Noto Serif SC","Songti SC","STSong","SimSun",Georgia,serif; }
+
+  .bgfx { position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .blob { position:absolute; border-radius:50%; filter:blur(70px); opacity:.5; }
+  .blob.b1 { width:56vw; height:56vw; left:-12vw; top:-14vw; background:radial-gradient(circle, var(--accent) 0%, transparent 70%); animation:drift1 26s ease-in-out infinite alternate; }
+  .blob.b2 { width:46vw; height:46vw; right:-10vw; bottom:-12vw; background:radial-gradient(circle, var(--accent) 0%, transparent 70%); opacity:.32; animation:drift2 32s ease-in-out infinite alternate; }
+  @keyframes drift1 { from { transform:translate(0,0) scale(1);} to { transform:translate(7vw,5vw) scale(1.15);} }
+  @keyframes drift2 { from { transform:translate(0,0) scale(1.1);} to { transform:translate(-6vw,-4vw) scale(.95);} }
+  .vignette { position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 36%, transparent 42%, rgba(4,3,9,.72) 100%); }
+
+  #app { position:relative; z-index:2; max-width:720px; margin:0 auto; padding:48px 18px 72px; }
+
+  .gate { text-align:center; padding:26px 0; }
+  .gate .card { background:rgba(12,10,20,.6); backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,.09);
+    border-radius:22px; padding:clamp(30px,6vw,56px); box-shadow:0 0 90px -30px var(--accent); }
+  .gate h1 { font-size:clamp(30px,6vw,44px); letter-spacing:.14em; margin-bottom:14px; }
+  .gate p { color:rgba(236,234,242,.6); font-size:15px; line-height:2; }
+  .gate .code-form { margin-top:30px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .gate input { width:min(300px,100%); padding:14px 18px; border-radius:999px; font-size:16px;
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.14); color:#eceaf2;
+    letter-spacing:.2em; text-align:center; outline:none; font-family:ui-monospace,Consolas,monospace; }
+  .gate input:focus { border-color:color-mix(in srgb, var(--accent) 60%, transparent); }
+  .gate input::placeholder { letter-spacing:.05em; font-family:inherit; color:rgba(236,234,242,.3); }
+  .btn-primary { display:inline-block; border:none; cursor:pointer; text-decoration:none;
+    background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #fff 8%));
+    color:#0a0912; font-weight:700; letter-spacing:.2em; text-indent:.2em; padding:14px 34px; border-radius:999px; font-size:14px;
+    box-shadow:0 8px 30px -8px var(--accent); transition:transform .22s ease; font-family:inherit; }
+  .btn-primary:hover { transform:translateY(-2px); }
+  .gate .err { margin-top:16px; font-size:13px; color:#ff8b8b; display:none; }
+  .gate .tiny { margin-top:26px; font-size:12px; color:rgba(236,234,242,.3); letter-spacing:.08em; }
+
+  .howto { margin-top:0; padding:16px 20px; border-radius:14px; font-size:13px; line-height:2;
+    color:rgba(236,234,242,.62); background:color-mix(in srgb, var(--accent) 7%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+  .howto b { color:var(--accent); }
+
+  .hero { text-align:center; margin-top:34px; animation:fadeUp .7s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(18px);} to { opacity:1; transform:none; } }
+  .hero .eyebrow { font-size:12px; letter-spacing:.5em; text-indent:.5em; color:rgba(236,234,242,.45); }
+  .hero .r-swatch { width:64px; height:64px; border-radius:50%; margin:26px auto 18px; box-shadow:0 0 60px -6px currentColor; animation:breathe 4.5s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+  .hero h1 { font-size:clamp(46px,10vw,70px); font-weight:700; letter-spacing:.1em; line-height:1.2; }
+  .hero .en { margin-top:10px; font-size:13px; letter-spacing:.5em; text-indent:.5em; color:rgba(236,234,242,.5); }
+  .hero .tag { margin-top:16px; font-size:15px; color:rgba(236,234,242,.75); letter-spacing:.08em; }
+
+  section.block { margin-top:46px; animation:fadeUp .7s ease both; }
+  .block-title { display:flex; align-items:baseline; gap:12px; margin-bottom:18px; }
+  .block-title .no { font-size:13px; color:var(--accent); letter-spacing:.2em; font-variant-numeric:tabular-nums; }
+  .block-title h2 { font-size:clamp(20px,3.6vw,24px); letter-spacing:.1em; font-weight:600; }
+  .panel { background:rgba(12,10,20,.58); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.08);
+    border-radius:18px; padding:clamp(22px,4.5vw,36px); box-shadow:0 20px 60px -30px rgba(0,0,0,.8); }
+
+  .dims { display:flex; flex-direction:column; gap:13px; }
+  .d-row { display:grid; grid-template-columns:88px 1fr 42px; gap:14px; align-items:center; }
+  .d-name { font-size:14px; color:rgba(236,234,242,.75); letter-spacing:.05em; }
+  .d-track { height:6px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; }
+  .d-track i { display:block; height:100%; width:0; border-radius:99px; transition:width 1.1s cubic-bezier(.2,.8,.2,1); }
+  .d-pct { font-variant-numeric:tabular-nums; font-size:13px; color:rgba(236,234,242,.55); text-align:right; }
+
+  .face-card { display:flex; gap:26px; align-items:center; }
+  .face-num { flex:0 0 auto; text-align:center; }
+  .face-num b { font-size:clamp(52px,10vw,72px); font-weight:700; color:var(--accent); line-height:1; font-variant-numeric:tabular-nums; }
+  .face-num span { display:block; margin-top:6px; font-size:12px; letter-spacing:.3em; color:rgba(236,234,242,.45); }
+  .face-txt { font-size:14px; line-height:2; color:rgba(236,234,242,.78); }
+  .face-txt b { color:var(--accent); letter-spacing:.1em; }
+
+  .prose p { font-size:15px; line-height:2.1; color:rgba(236,234,242,.85); }
+  .prose p + p { margin-top:14px; }
+  .cross { margin-top:18px; padding:14px 18px; border-radius:12px; font-size:14px; line-height:1.95;
+    color:rgba(236,234,242,.78); background:color-mix(in srgb, var(--accent) 8%, transparent);
+    border-left:2px solid var(--accent); }
+  .cross b { color:var(--accent); }
+
+  .ls-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .ls { border-radius:14px; padding:18px; }
+  .ls.light { background:rgba(85,201,163,.06); border:1px solid rgba(85,201,163,.25); }
+  .ls.shadow { background:rgba(255,94,98,.05); border:1px solid rgba(255,94,98,.22); }
+  .ls h3 { font-size:14px; letter-spacing:.2em; margin-bottom:12px; }
+  .ls.light h3 { color:#7ddcb8; }
+  .ls.shadow h3 { color:#ff9d9f; }
+  .ls ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .ls li { font-size:13.5px; line-height:1.9; color:rgba(236,234,242,.78); padding-left:16px; position:relative; }
+  .ls.light li::before { content:""; position:absolute; left:0; top:.66em; width:6px; height:6px; border-radius:50%; background:#7ddcb8; }
+  .ls.shadow li::before { content:""; position:absolute; left:0; top:.66em; width:6px; height:6px; border-radius:50%; background:#ff9d9f; }
+  .blind { margin-top:14px; padding:16px 18px; border-radius:12px; font-size:14px; line-height:2;
+    color:rgba(236,234,242,.8); background:rgba(255,255,255,.03); border:1px dashed rgba(255,255,255,.18); }
+  .blind b { color:var(--accent); letter-spacing:.15em; }
+
+  .sub3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
+  .sub3 .cell { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:18px; }
+  .sub3 h3 { font-size:14px; letter-spacing:.15em; color:var(--accent); margin-bottom:10px; }
+  .sub3 p { font-size:13.5px; line-height:1.95; color:rgba(236,234,242,.72); }
+
+  .scene { font-size:15px; line-height:2.15; color:rgba(236,234,242,.85); }
+  .scene::before { content:"「"; color:var(--accent); font-size:1.4em; line-height:0; vertical-align:-.12em; margin-right:6px; }
+  .scene::after { content:"」"; color:var(--accent); font-size:1.4em; line-height:0; vertical-align:-.12em; margin-left:6px; }
+
+  ul.list { list-style:none; display:flex; flex-direction:column; gap:12px; }
+  ul.list li { position:relative; padding-left:24px; font-size:14.5px; line-height:1.9; color:rgba(236,234,242,.8); }
+  ul.list li::before { content:""; position:absolute; left:2px; top:.62em; width:7px; height:7px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 10px var(--accent); }
+
+  ul.mine { list-style:none; display:flex; flex-direction:column; gap:12px; }
+  ul.mine li { position:relative; padding:14px 16px 14px 40px; border-radius:12px; font-size:14.5px; line-height:1.85;
+    color:rgba(236,234,242,.82); background:rgba(255,94,98,.04); border:1px solid rgba(255,94,98,.18); }
+  ul.mine li::before { content:"✕"; position:absolute; left:14px; top:12px; color:#ff8b8b; font-weight:700; }
+
+  ul.approach { list-style:none; counter-reset:ap; display:flex; flex-direction:column; gap:12px; }
+  ul.approach li { counter-increment:ap; position:relative; padding:14px 16px 14px 52px; border-radius:12px;
+    font-size:14.5px; line-height:1.85; color:rgba(236,234,242,.82);
+    background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, transparent), transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+  ul.approach li::before { content:counter(ap,decimal-leading-zero); position:absolute; left:16px; top:15px;
+    font-size:13px; color:var(--accent); font-variant-numeric:tabular-nums; letter-spacing:.05em; }
+
+  .chat-opener { font-size:15px; line-height:2.1; color:rgba(236,234,242,.85); }
+  .chat-sec-title { font-size:13px; letter-spacing:.25em; color:var(--accent); margin:26px 0 14px; display:flex; align-items:center; gap:10px; }
+  .chat-sec-title::after { content:""; flex:1; height:1px; background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 35%, transparent), transparent); }
+  .style-row { display:flex; gap:14px; align-items:flex-start; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+  .style-row:last-child { border-bottom:none; }
+  .style-name { flex:0 0 92px; font-size:14px; color:rgba(236,234,242,.85); padding-top:2px; }
+  .style-stars { flex:0 0 76px; letter-spacing:2px; font-size:13px; padding-top:3px; }
+  .style-stars .on { color:var(--accent); }
+  .style-stars .off { color:rgba(255,255,255,.14); }
+  .style-note { font-size:13px; line-height:1.85; color:rgba(236,234,242,.62); }
+  .bubbles { display:flex; flex-direction:column; gap:12px; }
+  .bubble { max-width:88%; padding:12px 16px; border-radius:18px 18px 18px 4px; font-size:14.5px; line-height:1.8;
+    color:#fff; background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 85%, #fff 10%), color-mix(in srgb, var(--accent) 70%, #000 30%));
+    box-shadow:0 6px 24px -10px var(--accent); align-self:flex-start; }
+  .chat-donts { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .chat-donts li { font-size:13.5px; line-height:1.85; color:rgba(236,234,242,.68); padding-left:22px; position:relative; }
+  .chat-donts li::before { content:"✕"; position:absolute; left:0; top:0; color:#ff8b8b; font-size:12px; font-weight:700; }
+
+  .footer-actions { margin-top:52px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .btn-ghost { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.03); color:#dcd9e8; cursor:pointer;
+    padding:13px 30px; border-radius:999px; font-size:14px; letter-spacing:.12em; font-family:inherit; text-decoration:none;
+    transition:border-color .25s, background .25s, transform .2s; }
+  .btn-ghost:hover { border-color:color-mix(in srgb, var(--accent) 60%, transparent); background:color-mix(in srgb, var(--accent) 8%, transparent); transform:translateY(-1px); }
+  .fine { margin-top:26px; text-align:center; font-size:12px; color:rgba(236,234,242,.3); letter-spacing:.1em; line-height:2; }
+
+  @media (max-width:520px) {
+    .d-row { grid-template-columns:70px 1fr 36px; gap:10px; }
+    .face-card { flex-direction:column; text-align:center; gap:18px; }
+    .ls-grid { grid-template-columns:1fr; }
+    .style-row { flex-wrap:wrap; }
+    .style-name, .style-stars { flex-basis:auto; }
+  }
+</style>
+</head>
+<body>
+<div class="bgfx"><div class="blob b1"></div><div class="blob b2"></div></div>
+<div class="vignette"></div>
+
+<div id="app">
+
+  <div id="gate" class="gate" style="display:none">
+    <div class="card">
+      <h1 class="serif">深度报告</h1>
+      <p>这份报告不在测试里,在结果码里。<br>输入 TA 测完后得到的结果码,查看深度解读。</p>
+      <div class="code-form">
+        <input id="code-input" placeholder="粘贴结果码,如 4k1c28..." maxlength="13" autocomplete="off" spellcheck="false">
+        <button class="btn-primary" id="btn-go">查看报告</button>
+      </div>
+      <p class="err" id="gate-err">结果码看起来不太对,检查一下位数或拼写</p>
+      <p class="tiny">报告仅供了解一个具体的人 · 人永远比报告复杂</p>
+    </div>
+  </div>
+
+  <div id="portrait" style="display:none">
+
+    <div class="howto" id="howto"></div>
+
+    <div class="hero">
+      <div class="eyebrow">UNDERNEATH · 深度报告</div>
+      <div class="r-swatch" id="p-swatch"></div>
+      <h1 class="serif" id="p-name"></h1>
+      <div class="en" id="p-en"></div>
+      <div class="tag" id="p-tag"></div>
+    </div>
+
+    <section class="block">
+      <div class="block-title"><span class="no">01</span><h2 class="serif">TA的六个切面</h2></div>
+      <div class="panel dims" id="p-dims"></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">02</span><h2 class="serif">颜值在意度</h2></div>
+      <div class="panel"><div class="face-card">
+        <div class="face-num"><b id="p-appnum">0</b><span>PERCENT</span></div>
+        <div class="face-txt" id="p-apptxt"></div>
+      </div></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">03</span><h2 class="serif">TA是谁</h2></div>
+      <div class="panel">
+        <div class="prose" id="p-who"></div>
+        <div class="cross" id="p-cross"></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">04</span><h2 class="serif">TA自己都没意识到的</h2></div>
+      <div class="panel">
+        <div class="ls-grid">
+          <div class="ls light"><h3>被低估的光</h3><ul id="p-light"></ul></div>
+          <div class="ls shadow"><h3>看不见的影</h3><ul id="p-shadow"></ul></div>
+        </div>
+        <div class="blind" id="p-blind"></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">05</span><h2 class="serif">TA的三观</h2></div>
+      <div class="panel sub3" id="p-values"></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">06</span><h2 class="serif">TA理想的一天</h2></div>
+      <div class="panel"><p class="scene serif" id="p-life"></p></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">07</span><h2 class="serif">TA想要的另一半</h2></div>
+      <div class="panel"><ul class="list" id="p-mate"></ul></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">08</span><h2 class="serif">想和TA一起做的事</h2></div>
+      <div class="panel"><ul class="list" id="p-do"></ul></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">09</span><h2 class="serif">聊天指南</h2></div>
+      <div class="panel" id="p-chat"></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">10</span><h2 class="serif">相处雷区</h2></div>
+      <div class="panel"><ul class="mine" id="p-mine"></ul></div>
+    </section>
+
+    <section class="block">
+      <div class="block-title"><span class="no">11</span><h2 class="serif">如何走近TA</h2></div>
+      <div class="panel"><ul class="approach" id="p-approach"></ul></div>
+    </section>
+
+    <div class="footer-actions">
+      <button class="btn-ghost" id="btn-share">复制此报告链接</button>
+      <a class="btn-ghost" href="index.html">回到测试</a>
+    </div>
+    <p class="fine">本报告由 30 个选择生成 · 它只是了解一个人的起点,不是判决书<br>愿TA刚好,也愿你有被讨厌的勇气和被喜欢的运气</p>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+const DIM_NAMES = ['浪漫','务实','安稳','独立','温暖','颜值'];
+const DIM_KEYS = ['rom','rea','sta','ind','war','app'];
+
+const SECOND = {
+  rom: 'TA的内核比外表看起来浪漫得多——再冷静的壳,底下都有心软的缝隙。别被TA表面的克制骗了。',
+  rea: 'TA比看起来更清醒务实:TA的心动都要先过一道理智安检。想让TA动心,先让TA信服。',
+  sta: 'TA比看起来更需要稳定感:新鲜感玩过头,TA会累。TA的热情需要一块能落地的土壤。',
+  ind: 'TA的内核比看起来更自由:抓得越紧,漏得越快。给TA留一扇虚掩的门,TA反而会自己回来。',
+  war: 'TA比看起来更在意人:TA的热闹和独立底下是软的——TA说的每一句「一个人也行」,翻译过来都是「有人懂我就好」。',
+  app: 'TA比看起来更吃「感觉」:氛围对了什么都对。TA的理性开关,在有眼缘的人面前会自动失灵。'
+};
+
+const TYPES = [
+{
+  key:'firework', name:'仲夏烟火', en:'THE FIREWORK', color:'#ff5e62', tagline:'炽热 · 直给 · 心动至上',
+  who:[
+    'TA的喜欢是有声音的。藏不住,眼睛会先说话,行动紧随其后。TA不擅长暧昧的拉扯——心动了就想靠近,靠近了就想确定,确定了就想把整个世界分给对方一半。',
+    '和TA在一起,你很少需要猜「TA到底喜不喜欢我」。TA的热情是即时的、外显的:今天想你就说想你了,看到适合你的东西就想买给你。浪漫对TA不是技巧,是本能。'
+  ],
+  light:[
+    'TA的热情是即时、具体、不带算计的——喜欢就是喜欢,没有中间商赚差价',
+    '行动力极强:答应的事第二天就开始动,从不画饼',
+    '认定一个人时,会主动把TA规划进所有计划里,不需要你开口要求'
+  ],
+  shadow:[
+    '上头快,下头也快:新鲜感是TA的命门,关系一进入平淡期,TA的注意力就容易飘',
+    '情绪上头时说话不过脑:刀子嘴先飞出去,伤完人自己先忘',
+    '冲动决策大户:闪辞、闪买、闪租,事后需要身边人帮忙收拾心情'
+  ],
+  blind:'TA常把「心动」误判成「爱情」,把「无聊」误判成「不爱了」。TA自己意识不到:TA最怕的不是分手,是安静下来——所以TA总在制造热闹,包括在你身上。',
+  values:[
+    ['爱情观','TA相信爱要大声说出来。仪式感、纪念日、突然出现在楼下——这些在TA的世界里不是矫情,是爱的证据。TA最怕的不是付出没有回报,而是爱着爱着变成了沉默。'],
+    ['生活观','TA要的生活得有光:可以不富裕,但不能没有盼头和新鲜感。一成不变的日子会熄灭TA,TA总在计划下一次出发。'],
+    ['金钱观','钱是燃料不是目的。TA愿意为体验和心爱的人买单,冲动消费指数偏高——对TA来说,为心动花钱从来不算浪费。']
+  ],
+  life:'周末的傍晚,和喜欢的人挤在厨房里做饭,音乐开得很大,TA在切菜的间隙凑过来亲你一口。饭后不着急收拾,先去江边散步,买一支冰淇淋分着吃。TA要的生活就是这样:有热气、有人、有盼头。',
+  mate:[
+    '能接得住TA的热情,并且回应它——TA不怕付出,怕的是一个人的独角戏',
+    '有自己的热爱和光芒,TA欣赏让TA觉得「哇」的人',
+    '能陪TA说走就走,也能在TA低落时稳稳接住情绪',
+    '最好也相信:浪漫不是虚荣,是生活的必需品'
+  ],
+  do:[
+    '说走就走的短途旅行,不查攻略的那种',
+    '深夜临时起意去看海、看日出',
+    '一起下厨,厨房里放TA的歌单',
+    '音乐节或livehouse,人潮里TA会牵紧你的手',
+    '给彼此准备毫无理由的小惊喜'
+  ],
+  chat:{
+    opener:'别铺垫,直接开场。TA最烦「在吗」「吃了吗」这种消耗型对话——一句「刚看到个东西第一个想到你」比十句寒暄都管用。热闹、直接、带点夸张的语气,TA天然接得住。',
+    topics:[
+      'TA最近上头的爱好——让TA讲,你捧哏就行',
+      'TA的高光时刻:赢过的比赛、做成过的事——让TA自己讲热血故事,TA讲完眼睛是亮的',
+      '想去的地方——顺势就能约',
+      '美食和探店:TA的清单永远缺人一起销',
+      '你们之间的小暗号和小八卦:共享秘密是TA的粘合剂'
+    ],
+    styles:[
+      ['幽默有趣',5,'最高适配。接得住梗、敢抖机灵,TA会觉得你「有点东西」。'],
+      ['正经认真',3,'适合聊正事和TA的计划,但全程正经会被TA判定为「无聊」。'],
+      ['土味情话',5,'要浓的,轻了TA没感觉——「我今晚不想喝奶茶,想你」这个级别的直接上。']
+    ],
+    lines:[
+      '刚看到一个特别离谱的事,不告诉你我难受,而且第一个想到的是你',
+      '我发现了,你是我今天快乐的具象化原因',
+      '周末有个想去的地方,缺个嘴甜的搭子,现在开始报名',
+      '你上次说的那件事后来怎么样了?我一直惦记着'
+    ],
+    donts:[
+      '已读不回、回复拖延——TA的热情凉得比外卖还快',
+      '端着不接梗:TA抛的球你不接,三次之后TA就不抛了',
+      '在TA兴奋的时候讲道理泼冷水,这是TA的禁区'
+    ]
+  },
+  mine:[
+    '冷暴力、已读不回:这会让TA的热情以肉眼可见的速度冻伤',
+    '永远的「随便」「都行」:TA要的是碰撞,不是一堵墙',
+    '把TA的浪漫当成「作」:TA的心意被轻视,比吵架更伤'
+  ],
+  approach:[
+    '大方回应TA的主动,TA要的从来不多,一句「我也是」就够了',
+    '偶尔反过来制造一次心动,TA会记很久很久',
+    '在TA情绪上头时不要急着讲道理,先接住情绪,再说别的'
+  ]
+},
+{
+  key:'rose', name:'深海玫瑰', en:'THE ROSE', color:'#b06bff', tagline:'内敛 · 深情 · 灵魂共鸣',
+  who:[
+    'TA的爱像退潮后的海:表面安静,底下全是暗涌。TA不轻易心动,但一旦心动的名单上写了谁,那个名字会停留很久。TA不擅长说漂亮话,却记得你所有随口提过的事。',
+    'TA慢热、被动、口是心非,看起来若即若离,其实每一次「算了」背后都是「再靠近我一点」。TA要的不是轰轰烈烈,是一个能一起安静待着、又能彻夜长谈的人。'
+  ],
+  light:[
+    'TA的喜欢是筛过千百次的稀有结果——一旦确认,浓度远超你的想象',
+    '观察力惊人:你藏起来的情绪,TA其实都看在眼里,只是不说',
+    '精神洁癖式的忠诚:认定了就是认定了,TA的世界里没有「骑驴找马」这个词'
+  ],
+  shadow:[
+    '慢热被动到让你怀疑人生:你不推,关系永远停在原地',
+    '口是心非十级选手:TA说「算了」的意思是「快来问我」,说「随便」的意思是「我不敢有要求」',
+    '会突然缩回自己的壳里消失几天,让对面的人没有安全感——而TA管这叫「给彼此空间」'
+  ],
+  blind:'TA以为安静是体贴,其实常让对方觉得疏远;TA以为「不麻烦别人」是成熟,其实是没给任何人一个爱TA的机会——TA把自己的需要藏得太好了,好到没人知道TA也需要被主动。',
+  values:[
+    ['爱情观','TA信奉「被看见」的爱:比起说出口的甜言蜜语,TA更在意你有没有读懂TA没说出口的部分。TA感情浓度极高,但释放通道很窄——能走到TA心里的人,才知道那里有多满。'],
+    ['生活观','TA需要独处回血,也需要深刻的联结扎根。TA理想的关系是:两个人各有各的世界,在交界处种一座花园。'],
+    ['金钱观','对钱的态度是「够用就好,但要留着说走就走的底气」。不挥霍也不苛刻,愿意为品质和心动留预算。']
+  ],
+  life:'一个有落地窗的傍晚,TA在沙发一头看书,你在另一头做自己的事,谁也不说话,但空气是暖的。偶尔抬头对视一眼,再各回各的世界。夜深了,关灯前TA突然说:「今天那个事,我想了很久……」——TA的话都在深夜。',
+  mate:[
+    '有耐心走进TA的慢热,不把TA的安静当冷淡',
+    '有自己的精神世界,能和TA聊到凌晨三点',
+    '愿意「听懂」TA,而不只是「听完」',
+    '忠诚、稳定、情绪成熟——TA把安全感看得比激情重'
+  ],
+  do:[
+    '深夜的长谈,聊那些从没跟别人说过的部分',
+    '一起看电影或看书,之后花两小时讨论',
+    '各自安静做事的「平行陪伴」',
+    '天台或海边吹风,不说话也很舒服的那种',
+    '交换歌单和收藏,拼出彼此的精神版图'
+  ],
+  chat:{
+    opener:'别用「在吗」开场,用内容开场:一首歌、一个现象、一个问题。深夜是TA的黄金档——TA的防线在夜里会自动降低两格。',
+    topics:[
+      'TA喜欢的书、影、剧——认真讨论的那种,不是「好看」两个字结束',
+      'TA的怪念头和小众收藏:奇怪的品味是TA的灵魂入口',
+      '童年和家乡:TA讲述过去的方式,藏着TA没展示过的部分',
+      '「没什么用但很美」的东西:云、雨、旧物件、老歌',
+      '假设性问题:如果中了彩票、如果只能带三样东西去荒岛'
+    ],
+    styles:[
+      ['正经认真',5,'高适配,尤其是深夜的深度话题——聊进去了,TA会记住很久。'],
+      ['幽默有趣',3,'可以,但要高级的有趣:冷幽默和自嘲可以,吵闹的搞笑会吓退TA。'],
+      ['土味情话',2,'慎用。油腻土味会让TA瞬间下头;走心的、克制的深情句子才有杀伤力。']
+    ],
+    lines:[
+      '这首歌听到第三遍想起你,不知道为什么',
+      '你上次说喜欢雨天的味道,今天下雨了,顺手拍给你',
+      '我猜你现在还没睡,猜对了陪我聊五毛钱的?',
+      '有个问题只敢问你:你觉得人为什么需要另一个人?'
+    ],
+    donts:[
+      '追问TA不想说的事——TA的门只从里面开',
+      '用感叹号和表情包轰炸:TA的语言密度在文字里,不在表情里',
+      '逼TA在人群里活跃或秒回:TA的慢是节奏,不是态度'
+    ]
+  },
+  mine:[
+    '被迫社交、被要求表演热情',
+    '隐私被窥探:TA的日记、手机、内心世界需要被尊重',
+    '那句「你怎么这么闷」:这句话会让TA永久关上门'
+  ],
+  approach:[
+    '别急着要回应,TA的信任是按月累积的',
+    '记住TA随口说的偏好,下次自然地做到——TA会全部记账',
+    '深夜是TA的敞开时刻,重要的话留到那时候说'
+  ]
+},
+{
+  key:'clear', name:'人间清醒', en:'THE CLEAR', color:'#e2a84b', tagline:'克制 · 明亮 · 通透',
+  who:[
+    'TA是那种会把心动先放进观察期的人。不是不浪漫,是浪漫之前先过了理智的安检。TA清楚自己要什么、不要什么,所以在感情里显得格外「稳」——不试探、不内耗、不玩暧昧。',
+    'TA的爱不悬浮:不写小作文,但记得还房贷的日子;不说永远,但每个决定里都有你。TA把「负责任」当成最深情的告白。'
+  ],
+  light:[
+    '情绪稳定到令人发指:出事的时候,TA是所有人下意识寻找的那颗定海神针',
+    '说到做到,TA的承诺含金量极高——不轻易给,给了就兑现',
+    '看问题一针见血,能帮你避开人生里大部分的大坑和烂人'
+  ],
+  shadow:[
+    '理智过剩,浪漫不足:TA的爱意像季度报告——准确、及时,但没有温度',
+    '吵架时讲逻辑不讲哄:「我们来复盘一下」这句话,能把对面气到心梗',
+    '心里有杆秤:你的每次失信都在默默扣分,扣满直接出局——没有预告,没有挽回窗口'
+  ],
+  blind:'TA以为自己在「有效沟通」,其实常让对面觉得「我在被评估」。TA最深的需求其实是「有个人让我不用一直清醒着」——但TA从不说,因为TA觉得说出这句话不体面。',
+  values:[
+    ['爱情观','TA要「势均力敌」的喜欢:不仰望谁,也不俯就谁。两个人并肩站着,各自发光,一起把日子过好——这是TA眼里爱情该有的样子。'],
+    ['生活观','TA的人生有一张清晰的地图:什么时候该拼、什么时候该停、什么值得投入。TA不喜欢失控,喜欢尽在掌握的踏实感。'],
+    ['金钱观','TA的钱包里有计划:储蓄、投资、消费各司其职。TA不抠门,但每笔大额支出都要「值得」——包括感情。']
+  ],
+  life:'工作日的晚上,加完班回到家,TA已经把第二天的计划排好。周末有一半留给自我提升,一半留给生活和TA在意的人。TA的书桌永远整洁,日程表永远清晰。偶尔抬头,TA也会想:如果有个人,能把这盘稳赢的棋下得更有趣一点,就好了。',
+  mate:[
+    '情绪稳定,遇事能沟通而不是崩溃',
+    '有自己的事业或热爱,TA欣赏「有用不完的劲」的人',
+    '边界感好:亲密,但不互相吞噬',
+    '承诺了就做到——TA把言出必行当性感'
+  ],
+  do:[
+    '一起健身或爬山,TA喜欢并肩流汗的踏实',
+    '计划一场高性价比的旅行,连备用方案都做好',
+    '逛超市、修东西、布置家——一起把生活经营起来',
+    '互相汇报成长进度,做彼此的「复盘搭子」'
+  ],
+  chat:{
+    opener:'有事说事,直接给钩子。TA欣赏「高效沟通」——一个具体的问题、一条有意思的资讯、一个TA能解答的求助,都是好开场。「在吗」会被TA在心里默默扣分。',
+    topics:[
+      'TA擅长领域的请教:让TA当老师,TA嘴上不说,心里很受用',
+      '行业干货、效率工具、好物测评',
+      '热点事件的理性讨论:TA的观点往往一针见血',
+      '健身、理财、计划——TA的自我管理体系是TA的骄傲',
+      '冷知识和数据:TA对「准确」和「有用」的东西有天然好感'
+    ],
+    styles:[
+      ['正经认真',5,'高适配。清晰的逻辑和条理,在TA眼里就是魅力本身。'],
+      ['幽默有趣',4,'聪明的幽默(冷幽默、梗、自嘲)加分;装傻卖萌减分。'],
+      ['土味情话',1,'基本无效甚至负分。唯一例外:极偶尔来一句反差土味,TA可能当场笑出声——一个月限一次。']
+    ],
+    lines:[
+      '向你请教个问题,想了一小时没想通,你是我的最优解',
+      '刚看到一个数据和你上次的判断完全吻合,快去看',
+      '今天遇到个事,只想讲给你这种明白人听',
+      '做了个计划表,里面有一项是「和你聊天」,已完成,成就感很高'
+    ],
+    donts:[
+      '「在吗」「吃了吗」「干嘛呢」三件套:TA的回复成本比你的提问成本高',
+      '频繁emo小作文:第一次TA会认真分析,第三次TA开始重新评估你',
+      '查岗式聊天:TA的自由度是底线,碰了直接出局'
+    ]
+  },
+  mine:[
+    '作、猜忌、查手机:无解,直接出局',
+    '依赖过度:TA可以做你的伞,但不当你的拐杖',
+    '拖延和失信:小小的爽约也会被TA记账'
+  ],
+  approach:[
+    '直接、坦率地表达好感,TA最吃「高效沟通」',
+    '展示你靠谱的一面:说到做到的人,在TA眼里自带光芒',
+    '别玩心机和若即若离,在TA的算法里这叫「噪音」'
+  ]
+},
+{
+  key:'moon', name:'山间明月', en:'THE MOON', color:'#55c9a3', tagline:'平淡 · 长情 · 岁月静好',
+  who:[
+    'TA的爱是炖出来的,不是炒出来的。TA不追求心跳加速的开场,而想要细水长流的日常。TA的浪漫藏在生活里:是留的那盏灯、煮好的那碗面、出门前帮你按平的衣角。',
+    'TA看起来钝钝的,其实心细如发。TA不把「我爱你」说得太频繁,但TA的世界里,你的位置从来没变过。TA是那种认定了,就是一辈子的人。'
+  ],
+  light:[
+    '长情程度超出你的预期:TA的爱以「年」为单位计息,还是复利',
+    '把日子过成散文诗:留的灯、煮的面、按平的衣角——细节里全是温柔',
+    '家人朋友对TA的评价极高——这是最硬的背书,TA的好是经过群众认证的'
+  ],
+  shadow:[
+    '太稳了,稳到缺乏惊喜:容易被「有趣」的外部信号晃一下,虽然TA嘴上绝不承认',
+    '回避冲突型选手:有事憋着、憋着、还是憋着,直到某天突然爆发或直接算了',
+    '对「家」有自己的模板,控制欲藏在「为你好」里:TA会安排很多你没答应过的事'
+  ],
+  blind:'TA把「从不吵架」当成关系好的标志,其实那只是TA一直在让。TA没意识到:自己的稳定到极致,某种意义上也是一种控制——用「懂事」把冲突全部打包内化了。',
+  values:[
+    ['爱情观','朴素得像句老话:执子之手,与子偕老。TA不理解忽冷忽热和若即若离——TA的爱是恒温的,给出去就不会轻易收回。'],
+    ['生活观','TA要的是「稳」:稳定的工作、健康的作息、三五个老朋友、一个越来越像家的房子。别人觉得TA无聊,TA觉得这叫落地。'],
+    ['金钱观','储蓄型的温柔:TA会为「以后」克制现在的消费,但对你从不吝啬——TA的支付密码可能就是你的生日。']
+  ],
+  life:'晚上七点的厨房,汤在锅里咕嘟作响,TA一边等一边收拾台面。你回家推门进来,TA头也不抬地说「洗手吃饭」。饭后一起散步到超市,买明天的菜和一盒TA记得你爱吃的草莓。这就是TA理想中最好的日子:没有大事,全是安稳。',
+  mate:[
+    '恋家、心软、吵架不过夜的那种人',
+    '能欣赏平淡日子里的好,不觉得安稳等于无聊',
+    '对家人朋友好——TA通过这个判断人品',
+    '愿意一起经营一个家,大到买房,小到换季的被子'
+  ],
+  do:[
+    '一起做饭加饭后散步,雷打不动的日常仪式',
+    '逛超市和菜市场,为挑到最甜的桃子击掌',
+    '在家追剧、拼图、打游戏,窝一整天',
+    '周末去父母家吃饭,或者短途郊游'
+  ],
+  chat:{
+    opener:'生活流开场最稳:「今天吃到个特别好吃的东西,想到你可能喜欢」。TA的世界由日常构成——能聊进TA的日常,就聊进了TA的人生。',
+    topics:[
+      '吃的:永远不会错的话题,聊深了还能约饭',
+      '小时候的事和家长里短:TA讲这些的时候最放松',
+      '正在追的剧和综艺:一起吐槽是最好的同步',
+      '生活好物、买菜做饭、布置房间——「过日子」话题是TA的舒适区',
+      '养生、锻炼、睡眠:TA对身体的关心超过TA自己承认的'
+    ],
+    styles:[
+      ['正经认真',4,'温和的正经很好:TA信任「说话踏实」的人。'],
+      ['幽默有趣',3,'家庭式幽默可以:互相调侃、吐槽日常;冒犯式玩笑不行。'],
+      ['土味情话',3,'老派的、笨拙的情话反而戳TA:「到家了吗」「降温了多穿点」,比「你是我的神」管用一百倍。']
+    ],
+    lines:[
+      '今天路过一家店,第一反应是你会喜欢,拍给你看',
+      '看到一个菜谱,第一个念头是做给你吃',
+      '降温了,你那边冷不冷?别只要风度',
+      '睡前汇报:今天也很想你,汇报完毕,明天见'
+    ],
+    donts:[
+      '已读不回或聊着聊着消失:TA的安全感是玻璃做的',
+      '聊几句就开始吹牛画大饼:TA对「说到做不到」容忍度极低',
+      '把TA的日常关心当啰嗦——TA不说,但会默默收回'
+    ]
+  },
+  mine:[
+    '忽冷忽热、行踪不定:TA的稳定感会崩塌',
+    '铺张浪费、今朝有酒今朝醉:TA会害怕',
+    '长期高压的变动:频繁搬家、换城市、一直漂着'
+  ],
+  approach:[
+    '从日常小事靠近TA:多约饭、多出现,TA的习惯里会长出你',
+    '直接一点没关系,TA反而怕拐弯抹角',
+    '对TA的家人朋友好,等于握住了TA心里的钥匙'
+  ]
+},
+{
+  key:'wind', name:'旷野之风', en:'THE WIND', color:'#4bc8e6', tagline:'自由 · 鲜活 · 灵魂有火',
+  who:[
+    'TA是那种「人生是旷野」的人。TA的喜欢很纯粹——被TA喜欢,你会觉得自己是TA浩瀚世界里唯一想停留的坐标。TA不缺热情,缺的是让TA甘愿降落的人。',
+    'TA的规则是:热爱不设限,亲密不设枷锁。TA想要的爱不是两个人抱成团取暖,而是两棵树站成一片森林:根在地下相握,枝叶各自生长。'
+  ],
+  light:[
+    '和TA在一起,你会变成更鲜活的自己:TA擅长把「普通的一天」过成回忆',
+    '零占有欲:给你世界罕见的自由和尊重,TA的爱不建立在监控之上',
+    'TA的世界辽阔:跟TA走一段,你能看到很多一个人看不到的风景'
+  ],
+  shadow:[
+    '逃避深度绑定:关系一聊到「以后」,TA就熟练地打岔',
+    '新鲜感依赖症:无聊对TA是酷刑——是的,包括当TA的世界变成例行公事的那部分',
+    '嘴上说「顺其自然」,其实是怕承诺之后的失去——TA连「怕失去」这件事都怕承认'
+  ],
+  blind:'TA以为「不给承诺」是对彼此的温柔,其实只是不给自己受伤的机会。TA没发现:TA最怕的不是被困住,是漂了太久没人喊TA回家——而「喊TA回家」的资格,TA其实很想给出去,只是TA不承认。',
+  values:[
+    ['爱情观','TA相信好的爱不该以「失去自我」为代价。TA可以很爱一个人,但永远保留说走就走的底气——不是随时离开你,是随时有面对世界的能力。'],
+    ['生活观','TA受不了被填满的日程和一眼望到头的人生。TA需要变化、新鲜、留白:TA的家可能很小,但TA的世界很大。'],
+    ['金钱观','钱主要花在体验和自由上:一次远行、一件乐器、一门课程。TA不为面子消费,但为热爱买单从不手软。']
+  ],
+  life:'一台相机、一个背包、一颗随时可以出发的心。工作半年,消失一个月。TA可能在洱海边上认识你,在大理的院子里想你,然后在一个平常的下午突然发消息:「我到你的城市了。」TA的理想生活没有固定形状,唯一的常量是:自由,和爱的人。',
+  mate:[
+    '有独立的人格和自己的热爱,不把人生重量压在TA身上',
+    '情绪松弛,不查岗不盘问:信任是TA的底线',
+    '有幽默感和好奇心,能接住TA随时冒出的怪念头',
+    '愿意一起出发,也给彼此留独行的空间'
+  ],
+  do:[
+    '说走就走的公路旅行,后座塞满零食和歌',
+    '一起学个新东西:冲浪、攀岩、乐器',
+    '深夜开车兜风,导航关掉随便开',
+    '交换「人生清单」,然后勾掉其中一项'
+  ],
+  chat:{
+    opener:'猎奇开场,别走寻常路。抛一个TA没见过的问题、一个奇怪的选择题、一个说走就走的提议——TA对「有意思」的阈值很高,但一旦过线,TA比谁都热情。',
+    topics:[
+      '没去过的地方和下次出发的计划——地图是TA的情书',
+      'TA在小众爱好上的段位:冲浪、乐器、胶片、改装,聊深了TA会两眼放光',
+      '奇怪的知识和脑洞:「为什么猫怕黄瓜」这类话题,TA能陪你聊一小时',
+      '对社会默认规则的吐槽:点到为止,TA欣赏清醒的叛逆',
+      '现场音乐、livehouse、音乐节:TA的电量来源'
+    ],
+    styles:[
+      ['幽默有趣',5,'最高适配。有趣是TA的通行证,能持续让TA笑的人,TA会主动来找。'],
+      ['正经认真',2,'可以聊正事,但说教必死:TA对「为你好」三个字过敏。'],
+      ['土味情话',3,'新奇的、TA没听过的土味,TA会笑很久;老一套的会被TA礼貌性忽略。']
+    ],
+    lines:[
+      '问你个事:如果现在开车出发,你选哪个方向?我先选,我选南',
+      '列了个「这辈子要干的100件怪事」清单,第37件缺个同伙',
+      '刚学到个冷知识笑死,快去查「为什么猫怕黄瓜」,回来谢我',
+      '别人问我你是什么样的人,我说:无可奉告,自己来了解'
+    ],
+    donts:[
+      '一天三次「你在干嘛」:TA的世界不设岗哨,问多了TA会消失',
+      '给TA的人生提建议、做规划:TA的地图只接受自己画',
+      '说TA「不现实」「该稳定了」:这话TA这辈子听得够多了,不缺你这一份'
+    ]
+  },
+  mine:[
+    '控制欲和查岗:TA会在窒息之前,先一步消失',
+    '一成不变的日常:TA管这个叫「活埋」',
+    '那句「你能不能正常点」:这句话会杀死TA眼里的光'
+  ],
+  approach:[
+    '做TA的同行者而不是锚:约TA去做没做过的事',
+    '给TA自由,TA反而会自己回来',
+    '保持有趣和神秘,TA对「探索不完的人」最上头'
+  ]
+},
+{
+  key:'letter', name:'暖阳信笺', en:'THE LETTER', color:'#ff9e7d', tagline:'温柔 · 细腻 · 把爱写进细节',
+  who:[
+    'TA是这个时代的慢递信。TA的爱不打扰,但永远在场:你随口说的一句,TA记很久;你低落的一个瞬间,TA隔着一座城市都能感觉到。TA不擅长索取,擅长的是在你反应过来之前,把一切安排好。',
+    'TA的温柔不是软弱,是选择。TA心里有杆秤,有自己的坚持,只是TA习惯先照顾别人的感受。能被TA放在心上的人,都领到了世界上最持久的那种好。'
+  ],
+  light:[
+    'TA的细心是稀缺资源:你的口味、忌口、随口一提,TA全都建档',
+    '情绪价值天花板:共情力拉满,难过了找TA,会被稳稳接住',
+    'TA的爱是具体的:一杯递到手边的热水,一句「到家了吗」,从不喊口号'
+  ],
+  shadow:[
+    '过度付出,委屈指数高:TA说的「没事」,一半以上是有事',
+    '讨好型底色:生气不敢大声,用撤退代替冲突,用「我没事」代替「我很委屈」',
+    '被辜负时不会闹,只会安静失望——攒够了直接走:没有挽留窗口,走得那天风平浪静'
+  ],
+  blind:'TA以为付出是爱,其实有一半是怕——怕不这样做就不被喜欢。TA没意识到:总把别人排第一的人,自己永远在候补名单里。TA最需要练习的句子是「我也很重要」,但TA说不出口。',
+  values:[
+    ['爱情观','TA要的是「被需要」和「被记得」的双向奔赴。TA不怕付出,怕付出像掉进黑洞没有回声。TA心中理想的关系:我把你放心上,而你恰好也知道。'],
+    ['生活观','TA把生活过成手账:纪念日、小收藏、给朋友挑的礼物、打印出来的合照。TA的世界不大,但每一寸都被认真布置过。'],
+    ['金钱观','TA的钱包有一半花在「值得的人」身上:给在意的人买东西,是TA表达爱最顺畅的方式。对自己,TA反而总说「够了够了」。']
+  ],
+  life:'一个有很多抽屉的家,每个抽屉都放着回忆。周末的上午,阳光照进来,TA在给远方的人挑礼物,或者在整理你们的合照。傍晚下雨,TA烧了一壶热茶,给你发消息:「今天别乱跑,我给你带了伞。」TA理想中的生活不需要观众,只需要几个被TA放在心上的人,平安喜乐。',
+  mate:[
+    '会心疼TA:看得见TA的付出,也心疼TA的委屈',
+    '主动表达爱,TA需要明确的回应来确认安全感',
+    '温和但有主见,能在TA纠结时帮TA拿主意',
+    '珍视TA的细心,而不是觉得理所当然'
+  ],
+  do:[
+    '一起给对方写信、留言——TA极度吃这一套',
+    '逛宜家和杂货店,幻想以后的家',
+    '给彼此过所有节日,包括纪念第一次见面',
+    '拍很多很多照片,回家打印成册',
+    '安静的散步,把今天的琐碎讲给对方听'
+  ],
+  chat:{
+    opener:'细节关心开场:提到TA上次说过的话。TA会因为「你居然记得」瞬间破防——这是TA世界里最高级别的被爱证明。',
+    topics:[
+      'TA的收藏、相册、小物件——每一样背后都有故事,TA很乐意讲',
+      'TA在意的日子:生日、纪念日、第一次见面聊了什么(你先记住)',
+      '家人和好朋友的故事:TA的人际关系档案是TA的软肋',
+      '手作、写信、明信片、胶带贴纸这类「慢事物」',
+      'TA最近的情绪:TA嘴上说没事,其实很需要有人问第二遍'
+    ],
+    styles:[
+      ['正经认真',4,'温柔的认真很好:TA吃「被郑重对待」的感觉。'],
+      ['幽默有趣',3,'温暖的幽默可以,TA喜欢让人放松的人,但抖机灵要有分寸。'],
+      ['土味情话',4,'走高不走量:走心的、具体的情话是核弹级;群发式油腻会直接出局。']
+    ],
+    lines:[
+      '你上次说的那家店,我路过看到开门了,拍给你',
+      '今天看到一句话很像你:「温柔的人都在偷偷撑着世界」——你最近还好吗',
+      '给你留了个东西,下次见面给你(悬念加约定,TA吃这套)',
+      '我不太会说漂亮话,但我记得你所有的随口一提'
+    ],
+    donts:[
+      '「嗯」「哦」「随便」三连:这不是回复,是刀',
+      '忘掉TA说过的重要日子或细节:TA嘴上没关系,心里记很久',
+      '把TA的付出当理所当然:TA不会闹,TA只会安静地失望,攒够就走'
+    ]
+  },
+  mine:[
+    '把TA的好当成理所当然:失望攒够了,TA会安静地走',
+    '敷衍的回应:「嗯」「哦」「随便」,每一个都在扎TA',
+    '重要的日子被遗忘:TA嘴上说没关系,心里会记很久'
+  ],
+  approach:[
+    '把TA为你做的事说出口:「谢谢你,我很喜欢」',
+    '记住TA的生日和忌口,反向操作会让TA沦陷',
+    '主动一点、再主动一点:TA的心动藏在「原来TA也在意我」的瞬间里'
+  ]
+}
+];
+
+function faceText(app) {
+  if (app >= 75) return ['重度在意','TA相信第一眼的直觉,美是TA理解世界的方式之一。但让TA留下来的,永远是相处中的心动——好看是入场券,灵魂才是VIP。'];
+  if (app >= 55) return ['中度在意','外表是敲门砖,但不是全部。TA会大方欣赏好看的人,不过真正沦陷靠的是氛围感:声音、气味、说话方式和某个瞬间的侧脸。'];
+  if (app >= 35) return ['氛围感选手','相比五官,TA更吃「感觉」。TA的心动常常说不清来路:可能是一句玩笑、一个举动、一种让人放松的气场。'];
+  return ['灵魂至上','在TA的世界里,好看是消耗品,契合是必需品。TA真正喜欢的,是聊得来、待得住的人——TA的审美,是「和你在一起的自己」。'];
+}
+
+/* ============ 解码 ============ */
+
+function parseCode(raw) {
+  const s = String(raw || '').trim().replace(/\s+/g, '').toLowerCase();
+  if (!/^[0-9a-z]{13}$/.test(s)) return null;
+  const t = parseInt(s[0], 36);
+  if (!(t >= 0 && t < TYPES.length)) return null;
+  const dims = [];
+  for (let i = 0; i < 6; i++) {
+    const v = parseInt(s.substr(1 + i * 2, 2), 36);
+    if (!(v >= 0 && v <= 100)) return null;
+    dims.push(v);
+  }
+  return { t, dims };
+}
+
+/* ============ 渲染 ============ */
+
+const $ = id => document.getElementById(id);
+
+function render(data) {
+  const T = TYPES[data.t];
+  const dims = data.dims;
+  const hex = T.color;
+
+  document.documentElement.style.setProperty('--accent', hex);
+
+  $('howto').innerHTML = '<b>怎么用这份报告:</b>先看「TA是谁」和「TA自己都没意识到的」,再背熟「聊天指南」,最后记住——分数只是倾向,人是活的。把它当地图,别当判决书。';
+
+  $('p-swatch').style.background = `radial-gradient(circle at 35% 35%, #ffffff22, transparent 40%), ${hex}`;
+  $('p-swatch').style.color = hex;
+  $('p-name').textContent = T.name;
+  $('p-name').style.color = hex;
+  $('p-name').style.textShadow = `0 0 46px ${hex}66`;
+  $('p-en').textContent = `${T.en} · ${T.tagline}`;
+  $('p-tag').textContent = '这份报告由 30 个真实的选择绘制';
+
+  const dimWrap = $('p-dims');
+  dimWrap.innerHTML = '';
+  DIM_NAMES.forEach((name, i) => {
+    const row = document.createElement('div');
+    row.className = 'd-row';
+    row.innerHTML =
+      `<span class="d-name">${name}</span>` +
+      `<div class="d-track"><i style="background:linear-gradient(90deg,${hex}77,${hex})"></i></div>` +
+      `<span class="d-pct">${dims[i]}</span>`;
+    dimWrap.appendChild(row);
+    const fill = row.querySelector('.d-track i');
+    requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = dims[i] + '%'; }));
+  });
+
+  const [lvl, txt] = faceText(dims[5]);
+  $('p-appnum').textContent = dims[5];
+  $('p-apptxt').innerHTML = `<b>${lvl}</b><br>${txt}`;
+
+  const who = $('p-who');
+  who.innerHTML = '';
+  for (const p of T.who) { const el = document.createElement('p'); el.textContent = p; who.appendChild(el); }
+
+  let secondKey = '', secondVal = -1;
+  for (let i = 0; i < 6; i++) if (i !== 5 && dims[i] > secondVal) { secondVal = dims[i]; secondKey = DIM_KEYS[i]; }
+  $('p-cross').innerHTML = `<b>隐藏切面</b> · ${SECOND[secondKey]}`;
+
+  const light = $('p-light');
+  light.innerHTML = '';
+  for (const item of T.light) { const li = document.createElement('li'); li.textContent = item; light.appendChild(li); }
+  const shadow = $('p-shadow');
+  shadow.innerHTML = '';
+  for (const item of T.shadow) { const li = document.createElement('li'); li.textContent = item; shadow.appendChild(li); }
+  $('p-blind').innerHTML = `<b>盲点</b> · ${T.blind}`;
+
+  const vals = $('p-values');
+  vals.innerHTML = '';
+  for (const [h, p] of T.values) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.innerHTML = `<h3>${h}</h3><p>${p}</p>`;
+    vals.appendChild(cell);
+  }
+
+  $('p-life').textContent = T.life;
+
+  const fillList = (id, arr) => {
+    const ul = $(id); ul.innerHTML = '';
+    for (const item of arr) { const li = document.createElement('li'); li.textContent = item; ul.appendChild(li); }
+  };
+  fillList('p-mate', T.mate);
+
+  const doList = T.do.slice();
+  if (dims[3] >= 70) doList.push('偶尔各玩各的,互不打扰,也是一种安心');
+  if (dims[0] >= 75) doList.push('一起看一次日出,什么都不干,就看太阳升起来');
+  fillList('p-do', doList);
+
+  fillList('p-mine', T.mine);
+
+  const chat = $('p-chat');
+  chat.innerHTML = '';
+  const opener = document.createElement('p');
+  opener.className = 'chat-opener';
+  opener.textContent = T.chat.opener;
+  chat.appendChild(opener);
+
+  const tTitle = document.createElement('div');
+  tTitle.className = 'chat-sec-title';
+  tTitle.textContent = '聊什么';
+  chat.appendChild(tTitle);
+  const tUl = document.createElement('ul');
+  tUl.className = 'list';
+  for (const item of T.chat.topics) { const li = document.createElement('li'); li.textContent = item; tUl.appendChild(li); }
+  chat.appendChild(tUl);
+
+  const sTitle = document.createElement('div');
+  sTitle.className = 'chat-sec-title';
+  sTitle.textContent = '什么语气';
+  chat.appendChild(sTitle);
+  for (const [name, stars, note] of T.chat.styles) {
+    const row = document.createElement('div');
+    row.className = 'style-row';
+    row.innerHTML =
+      `<span class="style-name">${name}</span>` +
+      `<span class="style-stars"><span class="on">${'●'.repeat(stars)}</span><span class="off">${'○'.repeat(5 - stars)}</span></span>` +
+      `<span class="style-note">${note}</span>`;
+    chat.appendChild(row);
+  }
+
+  const lTitle = document.createElement('div');
+  lTitle.className = 'chat-sec-title';
+  lTitle.textContent = '可以直接发的话';
+  chat.appendChild(lTitle);
+  const bubbles = document.createElement('div');
+  bubbles.className = 'bubbles';
+  for (const line of T.chat.lines) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.textContent = line;
+    bubbles.appendChild(b);
+  }
+  chat.appendChild(bubbles);
+
+  const dTitle = document.createElement('div');
+  dTitle.className = 'chat-sec-title';
+  dTitle.textContent = '千万别';
+  chat.appendChild(dTitle);
+  const dUl = document.createElement('ul');
+  dUl.className = 'chat-donts';
+  for (const item of T.chat.donts) { const li = document.createElement('li'); li.textContent = item; dUl.appendChild(li); }
+  chat.appendChild(dUl);
+
+  const approach = T.approach.slice();
+  if (dims[5] >= 60) approach.push('TA在意「好看的感觉」胜过「贵」:见面用心收拾一下自己,效果远超一顿大餐');
+  else if (dims[5] < 35) approach.push('别在TA面前过度经营人设:TA要的是真实和聊得来,不是精修的朋友圈');
+  fillList('p-approach', approach);
+
+  $('portrait').style.display = '';
+}
+
+/* ============ 入口 ============ */
+
+function enter(code) {
+  const data = parseCode(code);
+  if (!data) {
+    $('gate').style.display = '';
+    $('gate-err').style.display = data === null && code ? 'block' : 'none';
+    return false;
+  }
+  history.replaceState(null, '', '?e=' + code);
+  render(data);
+  window.scrollTo(0, 0);
+  return true;
+}
+
+const urlCode = new URLSearchParams(location.search).get('e');
+if (!enter(urlCode)) {
+  $('btn-go').addEventListener('click', () => {
+    if (!enter($('code-input').value)) $('gate-err').style.display = 'block';
+  });
+  $('code-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (!enter($('code-input').value)) $('gate-err').style.display = 'block';
+    }
+  });
+}
+
+/* ============ 复制链接 ============ */
+
+$('btn-share').addEventListener('click', () => {
+  const text = `一份《你的底色》深度报告:\n${location.href}`;
+  const p = navigator.clipboard && window.isSecureContext
+    ? navigator.clipboard.writeText(text)
+    : new Promise((res, rej) => {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); res(); } catch (e) { rej(e); }
+        finally { ta.remove(); }
+      });
+  p.then(() => {
+    const btn = $('btn-share'); const old = btn.textContent;
+    btn.textContent = '已复制 ✓';
+    setTimeout(() => { btn.textContent = old; }, 1600);
+  }).catch(() => alert('复制失败,请手动复制地址栏链接'));
+});
+</script>
+</body>
+</html>

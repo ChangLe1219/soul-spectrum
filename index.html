@@ -3,198 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>灵魂光谱 · 你是什么样的人</title>
-<meta name="description" content="一份关于你是什么样的人的测试。背景会随你的选择而变化——那是正在显影的你。">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff5a3c'/%3E%3Cstop offset='.5' stop-color='%233f6dff'/%3E%3Cstop offset='1' stop-color='%23b46bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='26' fill='url(%23g)'/%3E%3C/svg%3E">
+<title>你的底色 · 一份关于你自己的小测试</title>
+<meta name="description" content="一份关于你自己的小测试。30道题,约六分钟。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238a81b1'/%3E%3Cstop offset='1' stop-color='%23405078'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='26' fill='url(%23g)'/%3E%3C/svg%3E">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --accent-rgb: 136, 129, 177;
-    --accent: rgb(136, 129, 177);
-    --tempo: 300;
-  }
-  html, body { height: 100%; }
-  body {
-    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
-    background: #05060b;
-    color: #e8eaf2;
-    overflow-x: hidden;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-  }
-  .serif { font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --accent:#8a81b1; }
+  html, body { height:100%; }
+  body { font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    background:#07060d; color:#eceaf2; overflow-x:hidden; min-height:100vh; -webkit-font-smoothing:antialiased; }
+  .serif { font-family:"Noto Serif SC","Songti SC","STSong","SimSun",Georgia,serif; }
 
-  #bg { position: fixed; inset: 0; z-index: 0; display: block; }
-  .vignette {
-    position: fixed; inset: 0; z-index: 1; pointer-events: none;
-    background: radial-gradient(ellipse at 50% 42%, transparent 48%, rgba(3, 4, 9, .62) 100%);
-  }
+  #bg { position:fixed; inset:0; z-index:0; }
+  .vignette { position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(4,3,9,.66) 100%); }
 
-  #app {
-    position: relative; z-index: 2; min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 44px 18px;
-  }
-  .screen { display: none; width: 100%; max-width: 680px; }
-  .screen.active { display: block; animation: screenIn .55s cubic-bezier(.2, .7, .3, 1) both; }
-  @keyframes screenIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  #app { position:relative; z-index:2; min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:44px 18px; }
+  .screen { display:none; width:100%; max-width:680px; }
+  .screen.active { display:block; animation:screenIn .55s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes screenIn { from { opacity:0; transform:translateY(16px);} to { opacity:1; transform:none; } }
 
-  .card {
-    background: rgba(10, 12, 20, .58);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, .08);
-    border-radius: 20px;
-    padding: clamp(26px, 5vw, 52px);
-    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .8), 0 0 90px -30px rgba(var(--accent-rgb), .32);
-  }
+  .card { background:rgba(12,10,20,.6); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.09); border-radius:22px; padding:clamp(26px,5vw,52px);
+    box-shadow:0 30px 80px -30px rgba(0,0,0,.85), 0 0 90px -30px var(--accent); }
 
-  /* ---------- intro ---------- */
-  .intro { text-align: center; }
-  .intro .eyebrow {
-    font-size: 12px; letter-spacing: .5em; text-indent: .5em;
-    color: rgba(232, 234, 242, .45); margin-bottom: 22px;
-  }
-  .intro h1 {
-    font-size: clamp(42px, 9vw, 74px); font-weight: 700; letter-spacing: .12em;
-    line-height: 1.15;
-    background: linear-gradient(120deg, #ffffff 30%, var(--accent));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .intro .sub {
-    margin-top: 18px; font-size: clamp(14px, 2.4vw, 16px);
-    color: rgba(232, 234, 242, .72); letter-spacing: .08em;
-  }
-  .intro .notes {
-    list-style: none; margin: 34px auto 0; max-width: 420px; text-align: left;
-    display: flex; flex-direction: column; gap: 12px;
-  }
-  .intro .notes li {
-    font-size: 14px; line-height: 1.7; color: rgba(232, 234, 242, .55);
-    padding-left: 20px; position: relative;
-  }
-  .intro .notes li::before {
-    content: ""; position: absolute; left: 0; top: .72em;
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--accent); box-shadow: 0 0 10px rgba(var(--accent-rgb), .9);
-  }
-  .intro .start-wrap { margin-top: 44px; }
-  .intro .tiny { margin-top: 26px; font-size: 12px; color: rgba(232, 234, 242, .3); letter-spacing: .1em; }
-  .rise { opacity: 0; animation: rise .9s cubic-bezier(.2, .7, .3, 1) forwards; }
-  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  .intro { text-align:center; }
+  .intro .eyebrow { font-size:12px; letter-spacing:.5em; text-indent:.5em; color:rgba(236,234,242,.45); margin-bottom:22px; }
+  .intro h1 { font-size:clamp(42px,9vw,74px); font-weight:700; letter-spacing:.14em; line-height:1.15;
+    background:linear-gradient(120deg,#fff 30%, var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .intro .sub { margin-top:18px; font-size:clamp(14px,2.4vw,16px); color:rgba(236,234,242,.72); letter-spacing:.08em; }
+  .intro .notes { list-style:none; margin:34px auto 0; max-width:430px; text-align:left; display:flex; flex-direction:column; gap:12px; }
+  .intro .notes li { font-size:14px; line-height:1.7; color:rgba(236,234,242,.55); padding-left:20px; position:relative; }
+  .intro .notes li::before { content:""; position:absolute; left:0; top:.72em; width:7px; height:7px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 10px var(--accent); }
+  .intro .start-wrap { margin-top:44px; }
+  .intro .tiny { margin-top:26px; font-size:12px; color:rgba(236,234,242,.3); letter-spacing:.1em; }
+  .rise { opacity:0; animation:rise .9s cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes rise { from { opacity:0; transform:translateY(18px);} to { opacity:1; transform:none; } }
 
-  .btn-primary {
-    display: inline-block; border: none; cursor: pointer;
-    background: linear-gradient(135deg, rgba(var(--accent-rgb), .95), rgba(var(--accent-rgb), .6));
-    color: #0a0b12; font-weight: 700; letter-spacing: .25em; text-indent: .25em;
-    padding: 16px 48px; border-radius: 999px; font-size: 15px;
-    transition: transform .22s ease, box-shadow .22s ease;
-    box-shadow: 0 8px 30px -8px rgba(var(--accent-rgb), .5);
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 44px -10px rgba(var(--accent-rgb), .6); }
-  .btn-primary:active { transform: translateY(0) scale(.98); }
+  .btn-primary { display:inline-block; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #fff 8%));
+    color:#0a0912; font-weight:700; letter-spacing:.25em; text-indent:.25em;
+    padding:16px 48px; border-radius:999px; font-size:15px; text-decoration:none;
+    transition:transform .22s ease, box-shadow .22s ease; box-shadow:0 8px 30px -8px var(--accent); }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 14px 44px -10px var(--accent); }
+  .btn-primary:active { transform:translateY(0) scale(.98); }
 
-  /* ---------- quiz ---------- */
-  .q-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
-  .q-count { font-variant-numeric: tabular-nums; letter-spacing: .18em; color: rgba(232, 234, 242, .45); font-size: 13px; }
-  .q-hint { font-size: 11px; letter-spacing: .35em; color: rgba(var(--accent-rgb), .85); text-transform: uppercase; }
-  .progress { height: 3px; background: rgba(255, 255, 255, .07); border-radius: 99px; overflow: hidden; margin-bottom: 34px; }
-  .progress i {
-    display: block; height: 100%; width: 0%;
-    background: linear-gradient(90deg, rgba(var(--accent-rgb), .45), var(--accent));
-    border-radius: 99px;
-    transition: width .5s cubic-bezier(.2, .8, .2, 1), background .6s ease;
-  }
-  .q-text { font-size: clamp(20px, 3.4vw, 25px); line-height: 1.65; margin-bottom: 30px; font-weight: 600; }
-  .opts { display: flex; flex-direction: column; gap: 12px; }
-  .opt {
-    display: flex; align-items: flex-start; gap: 14px; text-align: left; width: 100%;
-    padding: 14px 18px; border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, .09);
-    background: rgba(255, 255, 255, .028);
-    color: #d9dde9; font-size: 15px; line-height: 1.6; cursor: pointer;
-    font-family: inherit;
-    transition: transform calc(var(--tempo) * 1ms) ease, border-color .25s, background .25s;
-  }
-  .opt .k {
-    flex: 0 0 auto; width: 27px; height: 27px; margin-top: 1px; border-radius: 8px;
-    display: grid; place-items: center;
-    font-size: 12px; font-weight: 700; color: var(--accent);
-    border: 1px solid rgba(var(--accent-rgb), .35);
-    transition: color .25s, border-color .25s;
-  }
-  .opt:hover { border-color: rgba(var(--accent-rgb), .55); background: rgba(var(--accent-rgb), .07); transform: translateX(6px); }
-  .opt:active { transform: scale(.985); }
-  .opt.chosen {
-    border-color: rgba(var(--accent-rgb), .9);
-    background: rgba(var(--accent-rgb), .14);
-    transform: translateX(6px);
-  }
-  .q-nav { margin-top: 28px; display: flex; justify-content: space-between; align-items: center; }
-  .back-btn {
-    background: none; border: none; cursor: pointer; color: rgba(232, 234, 242, .4);
-    font-size: 13px; letter-spacing: .1em; padding: 6px 0; transition: color .2s; font-family: inherit;
-  }
-  .back-btn:hover { color: rgba(232, 234, 242, .85); }
-  .back-btn[disabled] { opacity: 0; pointer-events: none; }
-  .kbd-hint { font-size: 12px; color: rgba(232, 234, 242, .28); letter-spacing: .05em; }
+  .q-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; }
+  .q-count { font-variant-numeric:tabular-nums; letter-spacing:.18em; color:rgba(236,234,242,.45); font-size:13px; }
+  .q-hint { font-size:11px; letter-spacing:.35em; color:rgba(236,234,242,.35); }
+  .progress { height:3px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; margin-bottom:34px; }
+  .progress i { display:block; height:100%; width:0%; background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 45%, transparent), var(--accent));
+    border-radius:99px; transition:width .5s cubic-bezier(.2,.8,.2,1); }
+  .q-text { font-size:clamp(20px,3.4vw,25px); line-height:1.65; margin-bottom:30px; font-weight:600; }
+  .opts { display:flex; flex-direction:column; gap:12px; }
+  .opt { display:flex; align-items:flex-start; gap:14px; text-align:left; width:100%;
+    padding:14px 18px; border-radius:14px; border:1px solid rgba(255,255,255,.09);
+    background:rgba(255,255,255,.028); color:#dcd9e8; font-size:15px; line-height:1.6; cursor:pointer;
+    font-family:inherit; transition:transform .25s ease, border-color .25s, background .25s; }
+  .opt .k { flex:0 0 auto; width:27px; height:27px; margin-top:1px; border-radius:8px; display:grid; place-items:center;
+    font-size:12px; font-weight:700; color:var(--accent); border:1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+  .opt:hover { border-color:color-mix(in srgb, var(--accent) 55%, transparent); background:color-mix(in srgb, var(--accent) 7%, transparent); transform:translateX(6px); }
+  .opt:active { transform:scale(.985); }
+  .opt.chosen { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 15%, transparent); transform:translateX(6px); }
+  .q-nav { margin-top:28px; display:flex; justify-content:space-between; align-items:center; }
+  .back-btn { background:none; border:none; cursor:pointer; color:rgba(236,234,242,.4); font-size:13px;
+    letter-spacing:.1em; padding:6px 0; transition:color .2s; font-family:inherit; }
+  .back-btn:hover { color:rgba(236,234,242,.85); }
+  .back-btn[disabled] { opacity:0; pointer-events:none; }
+  .kbd-hint { font-size:12px; color:rgba(236,234,242,.28); letter-spacing:.05em; }
 
-  /* ---------- result ---------- */
-  .result { text-align: center; }
-  .r-eyebrow { font-size: 12px; letter-spacing: .5em; text-indent: .5em; color: rgba(232, 234, 242, .45); }
-  .r-swatch {
-    width: 66px; height: 66px; border-radius: 50%; margin: 26px auto 20px;
-    box-shadow: 0 0 60px -6px currentColor;
-    animation: breathe 4.5s ease-in-out infinite;
-  }
-  @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.09); } }
-  .r-name {
-    font-size: clamp(46px, 10vw, 72px); font-weight: 700; letter-spacing: .1em; line-height: 1.2;
-  }
-  .r-en { margin-top: 10px; font-size: 13px; letter-spacing: .5em; text-indent: .5em; color: rgba(232, 234, 242, .5); }
-  .r-formula { margin-top: 20px; font-size: 15px; letter-spacing: .06em; color: rgba(232, 234, 242, .75); }
-  .spectrum {
-    display: flex; height: 10px; border-radius: 99px; overflow: hidden; margin: 26px auto 0;
-    max-width: 420px; background: rgba(255, 255, 255, .06);
-  }
-  .spectrum i { display: block; height: 100%; transition: width 1s cubic-bezier(.2, .8, .2, 1); }
-  .r-desc { margin-top: 34px; text-align: left; }
-  .r-desc p { font-size: 15px; line-height: 2.05; color: rgba(232, 234, 242, .82); }
-  .r-desc p + p { margin-top: 14px; }
-  .r-blind {
-    margin-top: 26px; text-align: left; padding: 16px 18px;
-    border-left: 2px solid var(--accent);
-    background: rgba(var(--accent-rgb), .06);
-    border-radius: 0 12px 12px 0;
-    font-size: 14px; line-height: 1.9; color: rgba(232, 234, 242, .68);
-  }
-  .r-bars { margin-top: 36px; display: flex; flex-direction: column; gap: 14px; }
-  .bar-row { display: grid; grid-template-columns: 52px 1fr 48px; align-items: center; gap: 14px; }
-  .bar-name { font-size: 14px; color: rgba(232, 234, 242, .75); letter-spacing: .1em; text-align: left; }
-  .bar-track { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .07); overflow: hidden; }
-  .bar-track i { display: block; height: 100%; width: 0; border-radius: 99px; transition: width 1.1s cubic-bezier(.2, .8, .2, 1); }
-  .bar-pct { font-variant-numeric: tabular-nums; font-size: 13px; color: rgba(232, 234, 242, .6); text-align: right; }
-  .r-quote {
-    margin-top: 36px; padding: 22px 8px; text-align: center;
-    font-size: 15px; line-height: 2; color: rgba(232, 234, 242, .62);
-    border-top: 1px solid rgba(255, 255, 255, .07);
-    border-bottom: 1px solid rgba(255, 255, 255, .07);
-  }
-  .r-quote b { color: var(--accent); font-weight: 600; letter-spacing: .15em; }
-  .r-actions { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-  .btn-ghost {
-    border: 1px solid rgba(255, 255, 255, .16); background: rgba(255, 255, 255, .03);
-    color: #d9dde9; cursor: pointer; padding: 13px 30px; border-radius: 999px;
-    font-size: 14px; letter-spacing: .12em; font-family: inherit;
-    transition: border-color .25s, background .25s, transform .2s;
-  }
-  .btn-ghost:hover { border-color: rgba(var(--accent-rgb), .6); background: rgba(var(--accent-rgb), .08); transform: translateY(-1px); }
-  .r-tiny { margin-top: 24px; font-size: 12px; color: rgba(232, 234, 242, .3); letter-spacing: .1em; }
+  .result { text-align:center; }
+  .r-eyebrow { font-size:12px; letter-spacing:.5em; text-indent:.5em; color:rgba(236,234,242,.45); }
+  .r-swatch { width:64px; height:64px; border-radius:50%; margin:26px auto 18px;
+    box-shadow:0 0 60px -6px currentColor; animation:breathe 4.5s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+  .r-name { font-size:clamp(44px,9vw,68px); font-weight:700; letter-spacing:.1em; line-height:1.2; }
+  .r-en { margin-top:10px; font-size:13px; letter-spacing:.5em; text-indent:.5em; color:rgba(236,234,242,.5); }
+  .r-desc { margin-top:26px; font-size:15px; line-height:2.1; color:rgba(236,234,242,.78); text-align:left; }
+  .code-card { margin-top:34px; padding:20px 18px; border-radius:16px; text-align:center;
+    background:rgba(255,255,255,.03); border:1px dashed color-mix(in srgb, var(--accent) 45%, transparent); }
+  .code-card .lbl { font-size:12px; letter-spacing:.3em; color:rgba(236,234,242,.45); }
+  .code-card .code { margin-top:12px; font-family:ui-monospace,Consolas,monospace; font-size:clamp(20px,4.6vw,26px);
+    letter-spacing:.28em; color:var(--accent); user-select:all; }
+  .code-card .tip { margin-top:12px; font-size:12px; color:rgba(236,234,242,.38); line-height:1.8; }
+  .r-actions { margin-top:36px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .btn-ghost { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.03); color:#dcd9e8; cursor:pointer;
+    padding:13px 30px; border-radius:999px; font-size:14px; letter-spacing:.12em; font-family:inherit;
+    transition:border-color .25s, background .25s, transform .2s; }
+  .btn-ghost:hover { border-color:color-mix(in srgb, var(--accent) 60%, transparent); background:color-mix(in srgb, var(--accent) 8%, transparent); transform:translateY(-1px); }
+  .r-tiny { margin-top:24px; font-size:12px; color:rgba(236,234,242,.3); letter-spacing:.1em; }
 
-  @media (max-width: 480px) {
-    .bar-row { grid-template-columns: 44px 1fr 42px; gap: 10px; }
-    .kbd-hint { display: none; }
-  }
+  @media (max-width:480px) { .kbd-hint{display:none;} }
 </style>
 </head>
 <body>
@@ -205,26 +106,26 @@
 
   <section id="screen-intro" class="screen active">
     <div class="card intro">
-      <div class="eyebrow rise" style="animation-delay:.05s">SOUL SPECTRUM</div>
-      <h1 class="serif rise" style="animation-delay:.2s">灵魂光谱</h1>
-      <p class="sub rise" style="animation-delay:.4s">一份关于你是什么样的人的测试</p>
+      <div class="eyebrow rise" style="animation-delay:.05s">UNDERNEATH</div>
+      <h1 class="serif rise" style="animation-delay:.2s">你的底色</h1>
+      <p class="sub rise" style="animation-delay:.4s">一份关于你自己的小测试</p>
       <ul class="notes rise" style="animation-delay:.6s">
-        <li>24 道题,约五分钟</li>
-        <li>没有对错,凭第一感觉作答</li>
-        <li>背景会随你的选择慢慢变化——那是正在显影的你</li>
+        <li>30 道题,约六分钟</li>
+        <li>没有对错,凭第一感觉</li>
+        <li>结束后你会得到一个专属于你的结果码</li>
       </ul>
       <div class="start-wrap rise" style="animation-delay:.8s">
         <button class="btn-primary" id="btn-start">开始测试</button>
       </div>
-      <p class="tiny rise" style="animation-delay:1s">结果仅供自我观察,不构成任何定义</p>
+      <p class="tiny rise" style="animation-delay:1s">结果仅供自我观察 · 人比测试大</p>
     </div>
   </section>
 
   <section id="screen-quiz" class="screen">
     <div class="card">
       <div class="q-top">
-        <span class="q-count" id="q-count">01 / 24</span>
-        <span class="q-hint" id="q-hint">正在显影</span>
+        <span class="q-count" id="q-count">01 / 30</span>
+        <span class="q-hint">凭第一感觉</span>
       </div>
       <div class="progress"><i id="q-progress"></i></div>
       <h2 class="q-text serif" id="q-text"></h2>
@@ -238,21 +139,22 @@
 
   <section id="screen-result" class="screen">
     <div class="card result">
-      <div class="r-eyebrow">你的灵魂光谱</div>
+      <div class="r-eyebrow">你的底色是</div>
       <div class="r-swatch" id="r-swatch"></div>
       <div class="r-name serif" id="r-name"></div>
       <div class="r-en" id="r-en"></div>
-      <div class="r-formula" id="r-formula"></div>
-      <div class="spectrum" id="spectrum"></div>
       <div class="r-desc" id="r-desc"></div>
-      <div class="r-blind" id="r-blind"></div>
-      <div class="r-bars" id="r-bars"></div>
-      <div class="r-quote" id="r-quote"></div>
+      <div class="code-card">
+        <div class="lbl">结果码</div>
+        <div class="code" id="r-code"></div>
+        <div class="tip">记下这串码,可凭它查看完整报告</div>
+      </div>
       <div class="r-actions">
+        <a class="btn-primary" id="btn-detail" href="detail.html" style="text-decoration:none">查看完整报告 →</a>
         <button class="btn-ghost" id="btn-copy">复制结果</button>
         <button class="btn-ghost" id="btn-restart">再测一次</button>
       </div>
-      <p class="r-tiny">感谢你的 24 个答案 · 光谱会记住这一刻的你</p>
+      <p class="r-tiny">感谢你的 30 个答案</p>
     </div>
   </section>
 
@@ -261,271 +163,394 @@
 <script>
 'use strict';
 
-/* ============ 数据 ============ */
+/* ============ 类型(对测试者呈现中性) ============ */
 
-const TYPES = {
-  fire: {
-    name: '烈焰', en: 'THE EMBER', color: '#ff5a3c',
-    rgb: [255, 90, 60], tagline: '炽热 · 直接 · 行动',
-    desc: [
-      '你的人生动词是「去」。想和做之间,你的距离最短。别人还在权衡,你已经上路;别人开始后悔,你已经在改。你相信速度本身就是一种诚实——喜欢就说,想要就追,不满就讲出来。',
-      '你的热烈不是表演,是体温。靠近你的人会被点燃,远离你的人说你危险——你两种都不太在乎。'
-    ],
-    blind: '你的盲点:偶尔会把「快」当成「对」,把沉默当成敌意。有些人和事,要慢下来才看得清。',
-    advice: '保留你的速度,练习你的刹车。',
-    secondary: '你的火焰之下,始终留着这簇不灭——它在你最冷静的决断里,偶尔亮一下。'
-  },
-  sea: {
-    name: '深海', en: 'THE ABYSS', color: '#3f6dff',
-    rgb: [63, 109, 255], tagline: '冷静 · 深度 · 秩序',
-    desc: [
-      '你习惯在下潜中思考。表面平静,底下有洋流。你不是没有情绪,只是每个情绪都要先过一遍审判;你不是不合群,只是热闹需要先过滤一遍,才轮得到你。',
-      '别人看到你的安静,看不到你脑内彻夜的推演。你的决定往往做得很慢,但一旦做出,几乎不回头。'
-    ],
-    blind: '你的盲点:有时会用「想清楚」拖住「做出来」。窗外的世界,不会等你算完所有变量。',
-    advice: '保留你的深度,练习你的浮出。',
-    secondary: '你的底层沉着一整片深海:所有炽热与柔软,最终都会沉回这片秩序里。'
-  },
-  star: {
-    name: '星尘', en: 'THE NEBULA', color: '#b46bff',
-    rgb: [180, 107, 255], tagline: '想象 · 敏感 · 独特',
-    desc: [
-      '你的世界,比别人多一层滤镜。同一条街,你能看到别人看不到的光;同一件小事,能在你心里余震很久。你收藏奇怪的东西,问奇怪的问题,在深夜突然想通一个没人讨论的道理。',
-      '你和世界之间始终隔着一层玻璃——这让你偶尔孤独,也让你独一无二。'
-    ],
-    blind: '你的盲点:想太多是你的天赋,也是你的税。有些事,做完了才算发生过。',
-    advice: '保留你的想象,练习你的落地。',
-    secondary: '你的缝隙里撒着星尘:它们负责你的奇思,和那些没说出口的浪漫。'
-  },
-  moss: {
-    name: '苔原', en: 'THE GROVE', color: '#2fd48a',
-    rgb: [47, 212, 138], tagline: '温厚 · 稳定 · 守护',
-    desc: [
-      '你是会被写进别人「感谢名单」的那种人。你记得谁的口味、谁的忌口、谁上次随口说的那句话。你的爱不喧哗,是具体的:一杯顺手的热水,一句「到家了吗」。',
-      '别人追逐浪,你是海底——不动声色地托住很多东西。只是你不说,所以很少有人知道,你也需要被托住一次。'
-    ],
-    blind: '你的盲点:把「为别人好」排在「为自己好」前面太久了。稳定,不该以自我忽略为代价。',
-    advice: '保留你的温柔,练习你的拒绝。',
-    secondary: '你的根系里缠着苔原:无论飞多远,你最终都会回到人的身上。'
-  }
-};
-const TYPE_KEYS = ['fire', 'sea', 'star', 'moss'];
-const TEMPO = { fire: 150, sea: 340, star: 230, moss: 420 };
+const TYPES = [
+  { key:'firework', name:'仲夏烟火', en:'THE FIREWORK', color:'#ff5e62',
+    tagline:'热烈 · 直接 · 直觉型选手',
+    desc:'你身上自带热度:想到就去做,直觉先行,后悔率极低。你的世界里很少有灰色地带——喜欢就靠近,无聊就换轨道。别人还在权衡的时候,你已经在路上了。',
+    ideal:[88,32,38,30,58,82] },
+  { key:'rose',     name:'深海玫瑰', en:'THE ROSE', color:'#b06bff',
+    tagline:'安静 · 有层次 · 需要时间展开',
+    desc:'你是慢热的人,但每一层都比上一层惊喜。热闹之外,你有自己的精神世界——能走进去的人不多,进去的都不想走。你的热闹是选择,安静才是出厂设置。',
+    ideal:[82,50,55,58,56,30] },
+  { key:'clear',    name:'人间清醒', en:'THE CLEAR', color:'#e2a84b',
+    tagline:'通透 · 有计划 · 情绪稳定',
+    desc:'你活得比较明白:知道自己要什么、不要什么。不跟风、不内耗,把力气都花在值得的地方——包括值得的人。你的朋友大概率说过同一句话:跟你聊天很省心。',
+    ideal:[35,85,62,80,40,45] },
+  { key:'moon',     name:'山间明月', en:'THE MOON', color:'#55c9a3',
+    tagline:'温吞 · 长情 · 生活流',
+    desc:'你更像炖汤,不是爆炒:初见平平,越处越有味。你要的不多——安稳的日常、几个老朋友、一个越来越像家的地方。你的长情以年为单位计息。',
+    ideal:[45,62,90,30,85,40] },
+  { key:'wind',     name:'旷野之风', en:'THE WIND', color:'#4bc8e6',
+    tagline:'自由 · 鲜活 · 不好归类',
+    desc:'你受不了被填满的人生。保持新鲜、保留空间、随时出发,是你的氧气。你不是叛逆,只是拒绝活成复印件——你的世界,比你展示出来的大得多。',
+    ideal:[58,40,25,90,50,50] },
+  { key:'letter',   name:'暖阳信笺', en:'THE LETTER', color:'#ff9e7d',
+    tagline:'细腻 · 温柔 · 记性好',
+    desc:'你是那种会把别人随口一句话记很久的人。你对世界有一套自己的收藏体系:照片、日期、小物件——都是你认真活过的证据。你的温柔不是软弱,是选择。',
+    ideal:[60,50,72,25,90,45] }
+];
 
-const QUESTIONS = [
-  { q: '周五晚上,朋友临时叫你出门,而你已换好睡衣瘫在沙发上——', o: [
-    { t: '换回去,出门,夜晚才刚开始', w: { fire: 3 } },
-    { t: '先问清楚:都有谁、去哪、几点散', w: { sea: 2, fire: 1 } },
-    { t: '假装没看见,脑内已经演完了聚会全程', w: { star: 2, sea: 1 } },
-    { t: '回一句「下次吧」,顺手给他们点奶茶外卖', w: { moss: 3 } }
+const DIMS = ['rom','rea','sta','ind','war','app'];
+
+/* ============ 基础题(24道,均衡覆盖) ============ */
+
+const BASE = [
+  { q:'刷短视频时,哪种内容会让你停下来多看两眼?', o:[
+    { t:'长得好看的人在镜头里', w:{ app:3 } },
+    { t:'反差很大的变装或改造', w:{ app:1, rom:2 } },
+    { t:'手艺类:做饭、木工、修复', w:{ rea:2 } },
+    { t:'风景和小动物', w:{ war:2 } }
   ]},
-  { q: '你更害怕哪一种人生?', o: [
-    { t: '一眼望到头的安稳', w: { fire: 2, star: 1 } },
-    { t: '突如其来的失控', w: { sea: 2, moss: 1 } },
-    { t: '成为毫无特点的背景板', w: { star: 3 } },
-    { t: '被信任的人狠狠辜负', w: { moss: 3 } }
+  { q:'理想中的住所是?', o:[
+    { t:'市中心,下楼就是烟火气', w:{ rom:1, sta:1 } },
+    { t:'安静小区,绿树成荫', w:{ sta:3 } },
+    { t:'住哪都行,人生是自己的', w:{ ind:2, rom:1 } },
+    { t:'靠近山或者海', w:{ rom:2, ind:1 } }
   ]},
-  { q: '你的手机相册里,最多的是?', o: [
-    { t: '各种截图:待办、攻略、聊天记录', w: { sea: 3 } },
-    { t: '天空、光影、奇奇怪怪的角落', w: { star: 3 } },
-    { t: '和朋友家人的连拍合影', w: { moss: 3 } },
-    { t: '几乎是空的,想看的直接用眼睛看', w: { fire: 2, sea: 1 } }
+  { q:'朋友裸辞去旅行三个月,你的第一反应?', o:[
+    { t:'太酷了,羡慕这种勇气', w:{ rom:2, ind:1 } },
+    { t:'羡慕,但我不敢', w:{ sta:2 } },
+    { t:'会想到TA回来的工作和社保', w:{ rea:2 } },
+    { t:'只要TA想清楚了就好', w:{ war:2, ind:1 } }
   ]},
-  { q: '深夜刷到一条戳中你的视频,你会?', o: [
-    { t: '秒转发给最可能懂的那个人', w: { moss: 2, star: 1 } },
-    { t: '收藏、分类、建文件夹', w: { sea: 3 } },
-    { t: '看完就算,情绪来了又走,不留痕', w: { fire: 2, sea: 1 } },
-    { t: '突然写一大段没人看的动态', w: { star: 2, fire: 1 } }
+  { q:'什么样的人会让你好感飙升?', o:[
+    { t:'记得你随口说过的话', w:{ war:3 } },
+    { t:'认真做事时的样子', w:{ app:1, rea:2 } },
+    { t:'仗义、能扛事', w:{ rom:2, rea:1 } },
+    { t:'给足你空间、从不盘问', w:{ ind:2 } }
   ]},
-  { q: '一场重要考试前夜,你在做什么?', o: [
-    { t: '把所有可能出现的考题推演一遍', w: { sea: 3 } },
-    { t: '打游戏装轻松,心里其实发紧', w: { fire: 2, star: 1 } },
-    { t: '和朋友煲电话粥,越聊越晚', w: { moss: 2, fire: 1 } },
-    { t: '早就准备好了,安静地等它到来', w: { moss: 1, sea: 2 } }
+  { q:'更愿意把钱花在?', o:[
+    { t:'体验:旅行、演出、一顿好饭', w:{ rom:2 } },
+    { t:'保值:理财、房子', w:{ rea:2, sta:2 } },
+    { t:'兴趣:设备、收藏、课程', w:{ ind:2 } },
+    { t:'送人:给家人朋友挑礼物', w:{ war:3 } }
   ]},
-  { q: '理想中的房子是?', o: [
-    { t: '市中心高层,夜景落地窗,便利至上', w: { fire: 2, sea: 1 } },
-    { t: '郊外小屋,院子里种满植物', w: { moss: 3 } },
-    { t: '哪都行,墙要能挂满我收集的东西', w: { star: 2, moss: 1 } },
-    { t: '一间书房、一张床,足够', w: { sea: 3 } }
+  { q:'理想的一天,时间多半给?', o:[
+    { t:'热爱的事', w:{ ind:2 } },
+    { t:'身边的人', w:{ war:2 } },
+    { t:'一半责任,一半生活', w:{ rea:2, sta:1 } },
+    { t:'随心,想到什么做什么', w:{ rom:3 } }
   ]},
-  { q: '和人观点激烈冲突时,你倾向于?', o: [
-    { t: '当场辩到底,越说越大声', w: { fire: 3 } },
-    { t: '表面附和,内心已经把对方驳了十轮', w: { sea: 2, star: 1 } },
-    { t: '先想:他为什么会这么想', w: { sea: 2, moss: 1 } },
-    { t: '换个话题,气氛比输赢重要', w: { moss: 3 } }
+  { q:'街上看到特别好看的人,你会?', o:[
+    { t:'多看几眼,纯粹欣赏美', w:{ app:3 } },
+    { t:'留意TA的穿搭细节', w:{ app:1, rom:1 } },
+    { t:'看一眼就过了,与我无关', w:{ rea:2 } },
+    { t:'会好奇TA生活中是什么样', w:{ rom:1, war:1 } }
   ]},
-  { q: '你的口头禅更接近?', o: [
-    { t: '「先干了再说」', w: { fire: 3 } },
-    { t: '「让我想想」', w: { sea: 3 } },
-    { t: '「你有没有想过一种可能……」', w: { star: 2, sea: 1 } },
-    { t: '「没事,慢慢来」', w: { moss: 3 } }
+  { q:'你更喜欢的生活节奏是?', o:[
+    { t:'稳定规律,按部就班', w:{ sta:3 } },
+    { t:'忙一阵闲一阵,有起伏', w:{ rom:1 } },
+    { t:'项目制,有挑战才带劲', w:{ rea:2 } },
+    { t:'越自由越好', w:{ ind:3 } }
   ]},
-  { q: '如果有一次「无代价重来」的机会,你会重选?', o: [
-    { t: '某个没敢开口的瞬间', w: { star: 2, moss: 1 } },
-    { t: '某个冲动的决定', w: { sea: 1, moss: 2 } },
-    { t: '不重选,错误也是我的一部分', w: { fire: 2, sea: 1 } },
-    { t: '想重选的太多,根本选不出来', w: { star: 2, fire: 1 } }
+  { q:'你心中「完美人生」更接近?', o:[
+    { t:'有所成就,被人看见', w:{ rea:2, rom:1 } },
+    { t:'重要的人都在身边', w:{ sta:2, war:2 } },
+    { t:'自由自在,四海为家', w:{ ind:3 } },
+    { t:'内心丰盈,不依赖外界认可', w:{ ind:1, rom:1 } }
   ]},
-  { q: '手机备忘录里,最可能写着?', o: [
-    { t: '密密麻麻的计划表,精确到小时', w: { sea: 2, fire: 1 } },
-    { t: '半句话、一个词、只有自己懂的暗号', w: { star: 3 } },
-    { t: '别人的生日、口味和忌口', w: { moss: 3 } },
-    { t: '基本是空的', w: { fire: 2, sea: 1 } }
+  { q:'深夜睡不着,你更想?', o:[
+    { t:'去天台或阳台吹风', w:{ rom:2, ind:1 } },
+    { t:'找个人聊到睡着', w:{ war:2, rom:1 } },
+    { t:'强迫自己睡,明天有事', w:{ rea:2, sta:1 } },
+    { t:'一个人的深夜影院', w:{ ind:1, sta:1 } }
   ]},
-  { q: '突然得到一周年假,你的第一反应?', o: [
-    { t: '立刻查机票,今晚就走', w: { fire: 3 } },
-    { t: '列出五个方案对比性价比', w: { sea: 2, fire: 1 } },
-    { t: '其实哪儿都想去,纠结到假期过半', w: { star: 2, sea: 1 } },
-    { t: '回家,或者去找老朋友', w: { moss: 3 } }
+  { q:'这辈子最重要的,你会选?', o:[
+    { t:'爱与被爱', w:{ war:2, rom:2 } },
+    { t:'活成自己想要的样子', w:{ ind:3 } },
+    { t:'稳稳的幸福', w:{ sta:3 } },
+    { t:'证明自己', w:{ rea:2, rom:1 } }
   ]},
-  { q: '你更容易被哪种人吸引?', o: [
-    { t: '热烈坦荡,爱憎分明', w: { fire: 2, star: 1 } },
-    { t: '温柔稳定,让人安心', w: { moss: 2, sea: 1 } },
-    { t: '聪明锐利,一针见血', w: { sea: 2, fire: 1 } },
-    { t: '神秘怪异,自成一套宇宙', w: { star: 3 } }
+  { q:'你会让亲近的人看你的歌单或日记吗?', o:[
+    { t:'会,想被TA了解', w:{ war:2, rom:1 } },
+    { t:'不会,那是我的秘密基地', w:{ ind:3 } },
+    { t:'挑着分享,留一点神秘', w:{ rom:2, ind:1 } },
+    { t:'TA问就说,但不主动', w:{ sta:1, rea:1 } }
   ]},
-  { q: '排队时有人插到你前面,你会?', o: [
-    { t: '直接提醒他,声音不小', w: { fire: 3 } },
-    { t: '冷冷盯着他,眼神施压', w: { fire: 1, sea: 2 } },
-    { t: '心里骂一句,算了', w: { star: 1, moss: 2 } },
-    { t: '默默退半步,给彼此余地', w: { moss: 2, star: 1 } }
+  { q:'拍照这件事,你的习惯是?', o:[
+    { t:'滤镜必须有,好看最重要', w:{ app:2, rom:1 } },
+    { t:'原相机直出,真实至上', w:{ rea:2, ind:1 } },
+    { t:'偶尔修一修,记录生活就好', w:{ war:1, sta:1 } },
+    { t:'喜欢拍别人,自己很少入镜', w:{ ind:1, rom:1 } }
   ]},
-  { q: '你对「仪式感」的看法是?', o: [
-    { t: '很重要,纪念日记得牢牢的', w: { moss: 3 } },
-    { t: '偶尔来一次,是生活的调味剂', w: { star: 3 } },
-    { t: '比起仪式,更在意事有没有做好', w: { sea: 2, fire: 1 } },
-    { t: '觉得刻意,但愿意陪重要的人演完', w: { fire: 2, moss: 1 } }
+  { q:'网上看到和你观点不同的言论,你会?', o:[
+    { t:'忍不住下场争论', w:{ rea:2, rom:1 } },
+    { t:'划走,道不同不相为谋', w:{ ind:2 } },
+    { t:'试着理解TA为什么这么想', w:{ war:2 } },
+    { t:'大多数时候懒得点开', w:{ sta:1, ind:1 } }
   ]},
-  { q: '做决定时,你最常问自己?', o: [
-    { t: '我想不想要', w: { fire: 2, star: 1 } },
-    { t: '值不值得', w: { sea: 3 } },
-    { t: '会不会影响别人', w: { moss: 3 } },
-    { t: '十年后的我会怎么看', w: { sea: 1, star: 2 } }
+  { q:'和重要的人闹了矛盾,之后你更倾向于?', o:[
+    { t:'当天解决,不带气过夜', w:{ sta:2, war:1 } },
+    { t:'各自冷静,过两天自然好', w:{ ind:2 } },
+    { t:'希望对方先来找我和好', w:{ rom:2, war:1 } },
+    { t:'把问题一条条讲清楚', w:{ rea:3 } }
   ]},
-  { q: '你的梦通常是?', o: [
-    { t: '奇幻场景:飞、坠落、陌生的城市', w: { star: 3 } },
-    { t: '白天琐事重演,还带着焦虑', w: { sea: 2, moss: 1 } },
-    { t: '很少记得梦,睡就是睡', w: { fire: 2, sea: 1 } },
-    { t: '熟悉的人,温暖的旧时光', w: { moss: 2, star: 1 } }
+  { q:'如果性格有颜色,你觉得自己是?', o:[
+    { t:'烈焰红,滚烫直接', w:{ rom:3 } },
+    { t:'奶咖色,温吞绵长', w:{ war:2, sta:1 } },
+    { t:'清冽蓝,冷静克制', w:{ ind:2, rea:1 } },
+    { t:'雾紫,说不太清,看心情', w:{ rom:1, app:1 } }
   ]},
-  { q: '你的桌面(电脑或工位)是?', o: [
-    { t: '极简,东西越少越好', w: { sea: 2, fire: 1 } },
-    { t: '乱中有序,只有我懂我的系统', w: { star: 2, sea: 1 } },
-    { t: '贴满照片、贴纸和小玩意', w: { star: 2, moss: 1 } },
-    { t: '乱,但气势磅礴', w: { fire: 3 } }
+  { q:'连续独处三天,你的状态是?', o:[
+    { t:'神仙日子,请勿打扰', w:{ ind:3 } },
+    { t:'前两天爽,后面有点空', w:{ war:1 } },
+    { t:'把日程排满,充实的很', w:{ rea:1, ind:1 } },
+    { t:'会开始想约人出来', w:{ rom:1, war:1 } }
   ]},
-  { q: '借出去的钱迟迟没还,你会?', o: [
-    { t: '直接开口要,不欠不赖', w: { fire: 3 } },
-    { t: '旁敲侧击,聊聊「最近手头紧」', w: { sea: 2, moss: 1 } },
-    { t: '一直记得,但永远开不了口', w: { moss: 2, star: 1 } },
-    { t: '找机会请他吃顿饭,顺便提一嘴', w: { moss: 2, fire: 1 } }
+  { q:'做重要决定时,你最先问自己?', o:[
+    { t:'我到底想不想要', w:{ rom:2 } },
+    { t:'值不值得', w:{ rea:3 } },
+    { t:'会不会影响身边的人', w:{ war:3 } },
+    { t:'直觉说了算,错了再改', w:{ rom:1, ind:2 } }
   ]},
-  { q: '过去一年,你的时间主要花在?', o: [
-    { t: '想清「我到底要什么」这件事上', w: { sea: 2, star: 1 } },
-    { t: '去做、去试、去撞南墙', w: { fire: 3 } },
-    { t: '打理和身边人的关系', w: { moss: 3 } },
-    { t: '说不清,时间就那么流走了', w: { star: 2, fire: 1 } }
+  { q:'最幸福的瞬间是?', o:[
+    { t:'被在意的人突然抱住', w:{ war:2, rom:2 } },
+    { t:'深夜长谈,说到心坎里', w:{ rom:2, ind:1 } },
+    { t:'安静待在一起,不说话也舒服', w:{ sta:2, war:1 } },
+    { t:'并肩拿下一个目标', w:{ rea:2, rom:1 } }
   ]},
-  { q: '世界末日前的最后一天,你会?', o: [
-    { t: '去做那件一直不敢做的事', w: { fire: 2, star: 1 } },
-    { t: '和每个重要的人好好告别,一个不漏', w: { moss: 3 } },
-    { t: '找个能看日落的地方,安静待着', w: { sea: 2, moss: 1 } },
-    { t: '把它记录下来,留给「可能的后来者」', w: { star: 3 } }
+  { q:'追一部剧或看一本书,最先吸引你的?', o:[
+    { t:'颜值、画面、封面', w:{ app:3 } },
+    { t:'剧情和内容本身', w:{ rea:2 } },
+    { t:'口碑和评分', w:{ rea:1, sta:1 } },
+    { t:'别人推荐,我就看', w:{ war:1 } }
   ]},
-  { q: '别人对你最常见的误解是?', o: [
-    { t: '太高冷,其实我只是懒得表演', w: { sea: 2, star: 1 } },
-    { t: '太冲动,其实我想得比谁都多', w: { fire: 2, sea: 1 } },
-    { t: '没心没肺,其实我在意得要命', w: { fire: 1, moss: 2 } },
-    { t: '太好说话,其实我有自己的底线', w: { moss: 3 } }
+  { q:'计划被突然打乱,你会?', o:[
+    { t:'烦躁,需要时间消化', w:{ sta:3 } },
+    { t:'随机应变,说不定更好', w:{ rom:1, ind:1 } },
+    { t:'尽快做一份新计划', w:{ sta:1, rea:2 } },
+    { t:'无所谓,走着看', w:{ ind:2 } }
   ]},
-  { q: '只能选一个超能力,你选?', o: [
-    { t: '时间暂停——世界安静,只剩我', w: { sea: 2, star: 1 } },
-    { t: '瞬间移动——想去哪就去哪', w: { fire: 3 } },
-    { t: '读心术——虽然我未必想知道', w: { star: 2, sea: 1 } },
-    { t: '治愈——让疼的人不疼', w: { moss: 3 } }
+  { q:'朋友情绪低落来找你,你更倾向?', o:[
+    { t:'直接到TA身边陪着', w:{ war:3 } },
+    { t:'认真听,帮TA分析', w:{ rea:1, war:1 } },
+    { t:'说笑话逗TA开心', w:{ rom:1, war:1 } },
+    { t:'给TA空间,等想聊再聊', w:{ ind:1 } }
   ]},
-  { q: '回顾过去一年,最深的感受是?', o: [
-    { t: '变化太快,我还在适应', w: { sea: 1, moss: 2 } },
-    { t: '做成了几件事,代价也不小', w: { fire: 2, sea: 1 } },
-    { t: '好像什么都没发生,又好像什么都变了', w: { star: 2, moss: 1 } },
-    { t: '身边的人都还在,就够了', w: { moss: 2, fire: 1 } }
+  { q:'好朋友要搬去很远的城市,你会?', o:[
+    { t:'难过,但会一直保持联系', w:{ war:2 } },
+    { t:'各自忙碌也很正常', w:{ ind:2 } },
+    { t:'想到就买票去找TA', w:{ rom:2, ind:1 } },
+    { t:'张罗一顿像样的送行饭', w:{ war:2, sta:1 } }
   ]},
-  { q: '最后:你希望别人在背后怎么形容你?', o: [
-    { t: '「那个人,活得真带劲」', w: { fire: 3 } },
-    { t: '「那个人,靠谱」', w: { moss: 2, sea: 1 } },
-    { t: '「很难懂,但很有意思」', w: { star: 3 } },
-    { t: '「看事情,很透」', w: { sea: 2, star: 1 } }
+  { q:'突然得到一周年假,你的第一反应?', o:[
+    { t:'立刻查机票,今晚就走', w:{ rom:2, ind:1 } },
+    { t:'列出几个方案对比一下', w:{ rea:2, rom:1 } },
+    { t:'纠结到假期过半', w:{ rom:2, sta:1 } },
+    { t:'回家,或者去找老朋友', w:{ war:3 } }
   ]}
 ];
 
+/* ============ 深挖题(按倾向追加,每维3道) ============ */
+
+const DEEP = {
+  rom: [
+    { q:'好朋友生日,你的准备方式是?', o:[
+      { t:'半个月前就开始策划惊喜', w:{ rom:3 } },
+      { t:'提前订好蛋糕和礼物', w:{ rea:2 } },
+      { t:'当天发祝福加红包', w:{ sta:2 } },
+      { t:'看情况,玩得开心最重要', w:{ ind:1 } }
+    ]},
+    { q:'你理解的「仪式感」是?', o:[
+      { t:'生活的必需燃料', w:{ rom:3 } },
+      { t:'锦上添花的东西', w:{ rea:2 } },
+      { t:'麻烦,但愿意为在意的人做', w:{ war:2 } },
+      { t:'没认真想过这个问题', w:{ ind:1 } }
+    ]},
+    { q:'突然看到特别美的晚霞,你会?', o:[
+      { t:'拍下来发给可能会懂的人', w:{ rom:2, war:1 } },
+      { t:'拍下来,自己收藏', w:{ rom:1, ind:1 } },
+      { t:'看几眼,继续赶路', w:{ rea:2 } },
+      { t:'心情会莫名好很久', w:{ rom:2 } }
+    ]}
+  ],
+  rea: [
+    { q:'大促的时候,你的购物车状态是?', o:[
+      { t:'提前研究了很久,列表清晰', w:{ rea:3 } },
+      { t:'想到什么买什么', w:{ rom:1 } },
+      { t:'只买清单里的必需品', w:{ sta:2 } },
+      { t:'基本不参与这类活动', w:{ ind:1 } }
+    ]},
+    { q:'换工作时,你最看重?', o:[
+      { t:'薪资和成长路径清晰', w:{ rea:3 } },
+      { t:'团队氛围和领导', w:{ war:2 } },
+      { t:'兴趣和新鲜感', w:{ rom:2 } },
+      { t:'自由度', w:{ ind:2 } }
+    ]},
+    { q:'朋友找你借钱创业,你会?', o:[
+      { t:'先问TA的商业计划', w:{ rea:3 } },
+      { t:'评估关系和风险再决定', w:{ rea:2, sta:1 } },
+      { t:'信TA,借', w:{ war:1, rom:1 } },
+      { t:'找个理由婉拒', w:{ ind:1 } }
+    ]}
+  ],
+  sta: [
+    { q:'搬家这件事,你的态度是?', o:[
+      { t:'能不搬就不搬', w:{ sta:2 } },
+      { t:'当作一次断舍离', w:{ rea:1 } },
+      { t:'想搬就搬,还有点兴奋', w:{ rom:1, ind:2 } },
+      { t:'会舍不得旧的邻里', w:{ war:2 } }
+    ]},
+    { q:'你对「变化」的真实态度是?', o:[
+      { t:'需要时间慢慢适应', w:{ sta:3 } },
+      { t:'期待,但也有点慌', w:{ rom:1, sta:1 } },
+      { t:'越乱越有劲', w:{ rea:1, ind:1 } },
+      { t:'计划赶不上变化,随它', w:{ ind:2 } }
+    ]},
+    { q:'假期最后一天的晚上,你的心情?', o:[
+      { t:'开始有点焦虑', w:{ sta:3 } },
+      { t:'抓紧享受最后的快乐', w:{ rom:2 } },
+      { t:'提前把明天的安排理好', w:{ rea:2 } },
+      { t:'无感,对我来说每天都一样', w:{ ind:2 } }
+    ]}
+  ],
+  ind: [
+    { q:'别人对你生活的参与度,你的态度?', o:[
+      { t:'希望有自己的地盘', w:{ ind:3 } },
+      { t:'有人参与更热闹', w:{ war:1, rom:1 } },
+      { t:'无所谓,都可以', w:{ sta:1 } },
+      { t:'分人,重要的人可以', w:{ war:2 } }
+    ]},
+    { q:'你的「洞穴时间」是?', o:[
+      { t:'独处回血,谁劝都没用', w:{ ind:3 } },
+      { t:'情绪不好时反而想找人', w:{ war:2 } },
+      { t:'独处久了会emo', w:{ war:1 } },
+      { t:'用做事把自己的时间填满', w:{ rea:1, ind:1 } }
+    ]},
+    { q:'理想的人生节奏是?', o:[
+      { t:'自己说了算', w:{ ind:2, rea:1 } },
+      { t:'和喜欢的人同频', w:{ rom:1, war:2 } },
+      { t:'稳定大过惊喜', w:{ sta:2 } },
+      { t:'随波逐流也挺有趣', w:{ rom:2 } }
+    ]}
+  ],
+  war: [
+    { q:'老朋友,你多久主动联系一次?', o:[
+      { t:'经常,想起就问候', w:{ war:3 } },
+      { t:'特殊的日子才联系', w:{ sta:1, rea:1 } },
+      { t:'基本等对方先找我', w:{ ind:2 } },
+      { t:'常想到TA,但不一定说', w:{ rom:1, ind:1 } }
+    ]},
+    { q:'关于别人,你最容易记住的是?', o:[
+      { t:'TA的口味、忌口、纪念日', w:{ war:3 } },
+      { t:'TA的工作和资源', w:{ rea:2 } },
+      { t:'和TA共同经历的事', w:{ rom:2 } },
+      { t:'说实话,只记得住自己的事', w:{ ind:2 } }
+    ]},
+    { q:'别人对你的好,哪种最戳你?', o:[
+      { t:'记得我随口说过的话', w:{ war:3 } },
+      { t:'关键时刻帮了我一把', w:{ rea:2 } },
+      { t:'给我制造惊喜', w:{ rom:2, app:1 } },
+      { t:'尊重我的空间', w:{ ind:2 } }
+    ]}
+  ],
+  app: [
+    { q:'你的偶像或特别欣赏的人,共同点是?', o:[
+      { t:'长在我的审美上', w:{ app:3 } },
+      { t:'有才华有实力', w:{ rea:2, ind:1 } },
+      { t:'人品好', w:{ war:2 } },
+      { t:'没有特别崇拜谁', w:{ ind:2 } }
+    ]},
+    { q:'对一个刚认识的人,你最先注意到?', o:[
+      { t:'长相、气质、穿搭', w:{ app:3 } },
+      { t:'谈吐和想法', w:{ rea:2, war:1 } },
+      { t:'气场和能量', w:{ rom:1, ind:1 } },
+      { t:'说不上来,就是感觉', w:{ war:1, app:1 } }
+    ]},
+    { q:'买衣服的时候,你更?', o:[
+      { t:'好看大于舒适,忍一下没关系', w:{ app:2, rom:1 } },
+      { t:'舒适大于好看', w:{ ind:2, war:1 } },
+      { t:'都要,多试几家', w:{ rea:2, app:1 } },
+      { t:'经典款,一次买几件穿几年', w:{ sta:2 } }
+    ]}
+  ]
+};
+
 /* ============ 状态 ============ */
 
-const TOTAL = QUESTIONS.length;
+const BASE_N = BASE.length;
+const DEEP_N = 6;
+const TOTAL = BASE_N + DEEP_N;
+const DIM_NAMES = { rom:'浪漫', rea:'务实', sta:'安稳', ind:'独立', war:'温暖', app:'颜值' };
+
+let QUESTIONS = BASE.slice();
 let answers = new Array(TOTAL).fill(-1);
 let idx = 0;
 let animating = false;
 
 const $ = id => document.getElementById(id);
-const root = document.documentElement;
 
-/* ============ 计分 ============ */
+/* ============ 评分 ============ */
 
-function scores() {
-  const s = { fire: 0, sea: 0, star: 0, moss: 0 };
-  for (let i = 0; i < idx; i++) {
-    const oi = answers[i];
-    if (oi < 0) continue;
-    const w = QUESTIONS[i].o[oi].w;
-    for (const k of TYPE_KEYS) if (w[k]) s[k] += w[k];
+const maxSum = {};
+for (const d of DIMS) maxSum[d] = 0;
+for (const item of QUESTIONS) for (const d of DIMS) {
+  let m = 0;
+  for (const o of item.o) if (o.w[d] > m) m = o.w[d];
+  maxSum[d] += m;
+}
+
+function calcDims() {
+  const sums = { rom:0, rea:0, sta:0, ind:0, war:0, app:0 };
+  for (let i = 0; i < TOTAL; i++) {
+    if (answers[i] < 0) continue;
+    const w = QUESTIONS[i].o[answers[i]].w;
+    for (const d of DIMS) if (w[d]) sums[d] += w[d];
   }
+  return DIMS.map(d => Math.min(100, Math.round(sums[d] / maxSum[d] * 100)));
+}
+
+function classify(dims) {
+  let best = 0, bestScore = -1;
+  for (let t = 0; t < TYPES.length; t++) {
+    let diff = 0;
+    for (let i = 0; i < 6; i++) diff += Math.abs(dims[i] - TYPES[t].ideal[i]);
+    const score = 100 - diff / 6;
+    if (score > bestScore) { bestScore = score; best = t; }
+  }
+  return best;
+}
+
+function encodeResult(t, dims) {
+  let s = t.toString(36);
+  for (const d of dims) s += d.toString(36).padStart(2, '0');
   return s;
 }
 
-function weights() {
-  const s = scores();
-  const total = TYPE_KEYS.reduce((a, k) => a + s[k], 0);
-  if (total === 0) return { fire: .25, sea: .25, star: .25, moss: .25 };
-  const w = {};
-  for (const k of TYPE_KEYS) w[k] = s[k] / total;
-  return w;
-}
+/* ============ 深挖注入:基础题答完后,按倾向追加 ============ */
 
-function dominantOf(w) {
-  let best = TYPE_KEYS[0];
-  for (const k of TYPE_KEYS) if (w[k] > w[best]) best = k;
-  return best;
-}
-
-function optionDom(w) {
-  let best = null;
-  for (const k in w) if (best === null || w[k] > w[best]) best = k;
-  return best;
-}
-
-/* ============ 主题色 ============ */
-
-let lastThemeUpdate = 0;
-function applyTheme(t) {
-  if (t - lastThemeUpdate < .15) return;
-  lastThemeUpdate = t;
-  const w = displayWeights;
-  let r = 0, g = 0, b = 0;
-  for (const k of TYPE_KEYS) {
-    const c = TYPES[k].rgb;
-    r += c[0] * w[k]; g += c[1] * w[k]; b += c[2] * w[k];
+function injectDeep() {
+  const sums = { rom:0, rea:0, sta:0, ind:0, war:0, app:0 };
+  for (let i = 0; i < BASE_N; i++) {
+    const w = BASE[i].o[answers[i]].w;
+    for (const d of DIMS) if (w[d]) sums[d] += w[d];
   }
-  root.style.setProperty('--accent-rgb', `${r | 0},${g | 0},${b | 0}`);
-  root.style.setProperty('--accent', `rgb(${r | 0},${g | 0},${b | 0})`);
-  root.style.setProperty('--tempo', TEMPO[dominantOf(w)]);
+  const ranked = DIMS.slice().sort((a, b) => sums[b] - sums[a] || Math.random() - .5);
+  const d1 = ranked[0], d2 = ranked[1];
+  const pool = [];
+  for (let i = 0; i < 3; i++) {
+    pool.push(DEEP[d1][i]);
+    pool.push(DEEP[d2][i]);
+  }
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  QUESTIONS = QUESTIONS.concat(pool);
+  for (const item of pool) for (const d of DIMS) {
+    let m = 0;
+    for (const o of item.o) if (o.w[d] > m) m = o.w[d];
+    maxSum[d] += m;
+  }
 }
 
-/* ============ 动态背景 ============ */
+/* ============ 动态背景(中性,渐暖) ============ */
 
 const canvas = $('bg');
 const ctx = canvas.getContext('2d');
 let W = 0, H = 0;
-
 function resize() {
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
   W = window.innerWidth; H = window.innerHeight;
@@ -536,108 +561,72 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-const BLOB_DEFS = {
-  fire: { home: [.72, .28], ampX: .24, ampY: .2, spd: .5,  rBase: .3 },
-  sea:  { home: [.26, .7 ], ampX: .15, ampY: .13, spd: .1,  rBase: .34 },
-  star: { home: [.72, .72], ampX: .3,  ampY: .24, spd: .26, rBase: .27, liss: 1.7 },
-  moss: { home: [.28, .24], ampX: .1,  ampY: .09, spd: .05, rBase: .3 }
-};
-const blobSeeds = {};
-for (const k of TYPE_KEYS) blobSeeds[k] = Math.random() * 100;
+const COLD = [[96,64,190],[70,110,220],[130,80,200]];
+const WARM = [[255,96,120],[255,150,90],[210,90,180]];
+let warmth = 0;
+let warmthTarget = 0;
 
-const displayWeights = { fire: .25, sea: .25, star: .25, moss: .25 };
-const pulses = { fire: 0, sea: 0, star: 0, moss: 0 };
+const BLOBS = [
+  { hx:.72, hy:.30, ax:.22, ay:.19, spd:.30, rBase:.30, seed:1.7 },
+  { hx:.26, hy:.68, ax:.16, ay:.15, spd:.18, rBase:.34, seed:4.2 },
+  { hx:.55, hy:.88, ax:.24, ay:.12, spd:.24, rBase:.26, seed:8.9 }
+];
 
-function rgba(c, a) { return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+const mix = (a, b, t) => a + (b - a) * t;
 
-function drawBlob(x, y, r, rgb, alpha) {
-  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-  g.addColorStop(0, rgba(rgb, alpha));
-  g.addColorStop(.55, rgba(rgb, alpha * .42));
-  g.addColorStop(1, rgba(rgb, 0));
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-const PARTICLE_N = 110;
+const PARTICLE_N = 90;
 const particles = [];
-function respawnParticle(p) {
-  p.x = Math.random() * W;
-  p.y = H + 10 + Math.random() * 40;
-  p.vx = (Math.random() - .5) * 8;
-  p.vy = -(6 + Math.random() * 14);
-  p.r = .6 + Math.random() * 1.9;
-  p.phase = Math.random() * Math.PI * 2;
-  p.spd = .8 + Math.random() * 2.4;
-  // 按当前显影比例分配颜色
-  const w = displayWeights;
-  let roll = Math.random(), acc = 0;
-  p.type = TYPE_KEYS[TYPE_KEYS.length - 1];
-  for (const k of TYPE_KEYS) { acc += w[k]; if (roll <= acc) { p.type = k; break; } }
+function respawn(p) {
+  p.x = Math.random() * W; p.y = H + 10 + Math.random() * 40;
+  p.vx = (Math.random() - .5) * 8; p.vy = -(6 + Math.random() * 13);
+  p.r = .6 + Math.random() * 1.8; p.ph = Math.random() * Math.PI * 2;
+  p.spd = .8 + Math.random() * 2.2;
 }
-for (let i = 0; i < PARTICLE_N; i++) {
-  const p = {};
-  respawnParticle(p);
-  p.y = Math.random() * H;
-  particles.push(p);
-}
+for (let i = 0; i < PARTICLE_N; i++) { const p = {}; respawn(p); p.y = Math.random() * H; particles.push(p); }
 
-function renderBg(t, dt) {
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.fillStyle = '#05060b';
-  ctx.fillRect(0, 0, W, H);
-
-  ctx.globalCompositeOperation = 'lighter';
-  const minDim = Math.min(W, H);
-
-  for (const k of TYPE_KEYS) {
-    const def = BLOB_DEFS[k];
-    const w = displayWeights[k];
-    const pulse = pulses[k];
-    let x = def.home[0] * W + Math.sin(t * def.spd + blobSeeds[k]) * def.ampX * W;
-    let y = def.home[1] * H + Math.sin(t * def.spd * (def.liss || 1) + blobSeeds[k] * 1.3) * def.ampY * H;
-    if (k === 'fire') {
-      x += (Math.sin(t * 6.3 + blobSeeds[k] * 5) + Math.sin(t * 9.7)) * 16;
-      y += Math.cos(t * 5.1 + blobSeeds[k] * 3) * 14;
-    }
-    let r = minDim * def.rBase * (.45 + w * 1.9);
-    if (k === 'fire') r *= 1 + .05 * Math.sin(t * 8);
-    r *= 1 + pulse * .3;
-    const alpha = .1 + w * .55 + pulse * .5;
-    drawBlob(x, y, r, TYPES[k].rgb, alpha);
-  }
-
-  for (const p of particles) {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    if (p.y < -14 || p.x < -14 || p.x > W + 14) respawnParticle(p);
-    const tw = .45 + .55 * Math.sin(t * p.spd + p.phase);
-    const w = displayWeights[p.type];
-    const a = Math.min(.9, tw * (.32 + w * 1.5));
-    if (a < .02) continue;
-    ctx.fillStyle = rgba(TYPES[p.type].rgb, a);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.globalCompositeOperation = 'source-over';
-}
+function rgba(c, a) { return `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`; }
 
 let lastFrame = performance.now();
 function frame(now) {
   const t = now / 1000;
   const dt = Math.min(.05, (now - lastFrame) / 1000);
   lastFrame = now;
+  warmth += (warmthTarget - warmth) * Math.min(1, dt * 1.6);
 
-  const target = weights();
-  const lerp = Math.min(1, dt * 2.2);
-  for (const k of TYPE_KEYS) displayWeights[k] += (target[k] - displayWeights[k]) * lerp;
-  for (const k of TYPE_KEYS) pulses[k] = Math.max(0, pulses[k] - dt * 1.6);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = '#07060d';
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'lighter';
 
-  renderBg(t, dt);
-  applyTheme(t);
+  const colors = [];
+  for (let i = 0; i < 3; i++) colors.push([
+    mix(COLD[i][0], WARM[i][0], warmth),
+    mix(COLD[i][1], WARM[i][1], warmth),
+    mix(COLD[i][2], WARM[i][2], warmth)
+  ]);
+
+  const minDim = Math.min(W, H);
+  for (const b of BLOBS) {
+    const x = b.hx * W + Math.sin(t * b.spd + b.seed) * b.ax * W;
+    const y = b.hy * H + Math.cos(t * b.spd * 1.2 + b.seed * 1.3) * b.ay * H;
+    const r = minDim * b.rBase * (1 + .04 * Math.sin(t * .8 + b.seed));
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, rgba(colors[0], .30));
+    g.addColorStop(.55, rgba(colors[1], .12));
+    g.addColorStop(1, rgba(colors[2], 0));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+
+  for (const p of particles) {
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    if (p.y < -14 || p.x < -14 || p.x > W + 14) respawn(p);
+    const tw = .45 + .55 * Math.sin(t * p.spd + p.ph);
+    const ci = (((p.x | 0) + (p.y | 0)) % 3 + 3) % 3;
+    ctx.fillStyle = rgba(colors[ci], .35 * tw);
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalCompositeOperation = 'source-over';
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -650,31 +639,21 @@ function show(id) {
   window.scrollTo(0, 0);
 }
 
-/* ============ 测试流程 ============ */
-
-const HINTS = ['正在显影', '轮廓渐起', '色彩浮动', '光影成形', '即将成像'];
+/* ============ 流程 ============ */
 
 function renderQuestion() {
   const item = QUESTIONS[idx];
   $('q-count').textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
   $('q-progress').style.width = (idx / TOTAL * 100) + '%';
-  const w = weights();
-  const dom = dominantOf(w);
-  const pct = Math.round(w[dom] * 100);
-  const phase = HINTS[Math.min(HINTS.length - 1, Math.floor(idx / (TOTAL / HINTS.length)))];
-  $('q-hint').textContent = `${TYPES[dom].name} ${pct}% · ${phase}`;
-
   $('q-text').textContent = item.q;
-
   const opts = $('opts');
   opts.innerHTML = '';
   const keys = ['A', 'B', 'C', 'D'];
   item.o.forEach((opt, i) => {
     const btn = document.createElement('button');
-    btn.className = 'opt';
-    btn.type = 'button';
+    btn.className = 'opt'; btn.type = 'button';
     btn.innerHTML = `<span class="k">${keys[i]}</span><span>${opt.t}</span>`;
-    btn.addEventListener('click', e => choose(i, btn));
+    btn.addEventListener('click', () => choose(i, btn));
     opts.appendChild(btn);
   });
   $('btn-back').disabled = idx === 0;
@@ -684,42 +663,33 @@ function choose(i, btn) {
   if (animating) return;
   animating = true;
   answers[idx] = i;
-  const dom = optionDom(QUESTIONS[idx].o[i].w);
-  pulses[dom] = 1;
-
   btn.classList.add('chosen');
   setTimeout(() => {
     animating = false;
     idx++;
+    warmthTarget = Math.min(1, idx / TOTAL);
+    if (idx === BASE_N && QUESTIONS.length === BASE_N) injectDeep();
     if (idx >= TOTAL) showResult();
-    else { renderQuestion(); show('screen-quiz'); }
-  }, 230);
+    else renderQuestion();
+  }, 240);
 }
 
 function goBack() {
   if (animating || idx === 0) return;
   idx--;
+  warmthTarget = Math.min(1, idx / TOTAL);
   renderQuestion();
-  show('screen-quiz');
 }
 
-/* ============ 结果 ============ */
-
-function buildResult() {
-  const s = scores();
-  const total = TYPE_KEYS.reduce((a, k) => a + s[k], 0);
-  const ranked = TYPE_KEYS.map(k => ({ k, raw: s[k], pct: Math.round(s[k] / total * 100) }));
-  ranked.sort((a, b) => b.raw - a.raw);
-  // 修正取整误差
-  const diff = 100 - ranked.reduce((a, r) => a + r.pct, 0);
-  ranked[0].pct += diff;
-  return ranked;
-}
+/* ============ 结果(中性) ============ */
 
 function showResult() {
-  const ranked = buildResult();
-  const top = ranked[0], second = ranked[1];
-  const T = TYPES[top.k];
+  const dims = calcDims();
+  const t = classify(dims);
+  const T = TYPES[t];
+  const code = encodeResult(t, dims);
+
+  document.documentElement.style.setProperty('--accent', T.color);
 
   $('r-swatch').style.background = `radial-gradient(circle at 35% 35%, #ffffff22, transparent 40%), ${T.color}`;
   $('r-swatch').style.color = T.color;
@@ -727,59 +697,31 @@ function showResult() {
   $('r-name').style.color = T.color;
   $('r-name').style.textShadow = `0 0 46px ${T.color}66`;
   $('r-en').textContent = `${T.en} · ${T.tagline}`;
-  $('r-formula').textContent = `${top.pct}% ${T.name} × ${second.pct}% ${TYPES[second.k].name}`;
-
-  const spectrum = $('spectrum');
-  spectrum.innerHTML = '';
-  for (const r of ranked) {
-    const seg = document.createElement('i');
-    seg.style.background = TYPES[r.k].color;
-    spectrum.appendChild(seg);
-    requestAnimationFrame(() => requestAnimationFrame(() => { seg.style.width = r.pct + '%'; }));
-  }
-
-  const desc = $('r-desc');
-  desc.innerHTML = '';
-  for (const p of T.desc) {
-    const el = document.createElement('p');
-    el.textContent = p;
-    desc.appendChild(el);
-  }
-  $('r-blind').textContent = T.blind;
-
-  const bars = $('r-bars');
-  bars.innerHTML = '';
-  for (const r of ranked) {
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML =
-      `<span class="bar-name">${TYPES[r.k].name}</span>` +
-      `<div class="bar-track"><i style="background:linear-gradient(90deg,${TYPES[r.k].color}88,${TYPES[r.k].color})"></i></div>` +
-      `<span class="bar-pct">${r.pct}%</span>`;
-    bars.appendChild(row);
-    const fill = row.querySelector('.bar-track i');
-    requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = r.pct + '%'; }));
-  }
-
-  const quote = $('r-quote');
-  quote.innerHTML = `隐性底色 · ${TYPES[second.k].name}<br>${TYPES[second.k].secondary}<br><br><b>${T.advice}</b>`;
-
+  $('r-desc').textContent = T.desc;
+  $('r-code').textContent = code;
+  $('btn-detail').href = 'detail.html?e=' + code;
   show('screen-result');
+  warmthTarget = 1;
 }
 
 /* ============ 复制 / 重来 ============ */
 
 let shareText = '';
+const origShowResult = showResult;
+showResult = function () {
+  origShowResult();
+  const dims = calcDims();
+  const T = TYPES[classify(dims)];
+  shareText = `我的底色是「${T.name}」\n结果码:${$('r-code').textContent}\n——你也来测测你的底色`;
+};
 
 function copyText(text) {
   if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
   return new Promise((res, rej) => {
     const ta = document.createElement('textarea');
     ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
     try { document.execCommand('copy'); res(); }
     catch (e) { rej(e); }
     finally { ta.remove(); }
@@ -788,51 +730,41 @@ function copyText(text) {
 
 $('btn-copy').addEventListener('click', () => {
   copyText(shareText).then(() => {
-    const btn = $('btn-copy');
-    const old = btn.textContent;
+    const btn = $('btn-copy'); const old = btn.textContent;
     btn.textContent = '已复制 ✓';
     setTimeout(() => { btn.textContent = old; }, 1600);
-  }).catch(() => alert('复制失败,请手动复制结果文字'));
+  }).catch(() => alert('复制失败,请手动复制'));
 });
 
 $('btn-restart').addEventListener('click', () => {
+  QUESTIONS = BASE.slice();
   answers = new Array(TOTAL).fill(-1);
-  idx = 0;
+  idx = 0; warmthTarget = 0;
+  for (const d of DIMS) maxSum[d] = 0;
+  for (const item of QUESTIONS) for (const d of DIMS) {
+    let m = 0;
+    for (const o of item.o) if (o.w[d] > m) m = o.w[d];
+    maxSum[d] += m;
+  }
+  document.documentElement.style.setProperty('--accent', '#8a81b1');
   show('screen-intro');
 });
 
 /* ============ 启动 ============ */
 
-$('btn-start').addEventListener('click', () => {
-  idx = 0;
-  renderQuestion();
-  show('screen-quiz');
-});
-
+$('btn-start').addEventListener('click', () => { idx = 0; renderQuestion(); show('screen-quiz'); });
 $('btn-back').addEventListener('click', goBack);
 
 window.addEventListener('keydown', e => {
   if (!$('screen-quiz').classList.contains('active')) return;
   if (e.key === 'Backspace') { e.preventDefault(); goBack(); return; }
-  const map = { '1': 0, '2': 1, '3': 2, '4': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+  const map = { '1':0, '2':1, '3':2, '4':3, 'a':0, 'b':1, 'c':2, 'd':3 };
   const i = map[e.key.toLowerCase()];
   if (i !== undefined && i < QUESTIONS[idx].o.length) {
     const btn = $('opts').children[i];
     if (btn) choose(i, btn);
   }
 });
-
-// 观察结果以供复制
-const origShowResult = showResult;
-showResult = function () {
-  origShowResult();
-  const ranked = buildResult();
-  const top = ranked[0], second = ranked[1];
-  shareText =
-    `我的灵魂光谱:「${TYPES[top.k].name}」${top.pct}%\n` +
-    ranked.map(r => `${TYPES[r.k].name} ${r.pct}%`).join(' · ') +
-    `\n${TYPES[top.k].advice}\n——你也来测测你是什么样的人`;
-};
 </script>
 </body>
 </html>
